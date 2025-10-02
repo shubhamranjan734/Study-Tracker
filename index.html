@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE ECE Preparation Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --card-bg: #ffffff;
+            --card-border: #f1f5f9;
+            --accent: #3b82f6;
+            --accent-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent: #60a5fa;
+            --accent-dark: #3b82f6;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark-mode .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .topic-checkbox {
+            accent-color: var(--accent);
+            transform: scale(1.1);
+            margin-right: 8px;
+        }
+        
+        .topic-checkbox:checked + span {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+        
+        .compact-details {
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+        
+        .compact-details summary {
+            padding: 0.75rem 1rem;
+            background-color: var(--card-bg);
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .compact-details summary:hover {
+            background-color: var(--card-border);
+        }
+        
+        .compact-details[open] summary {
+            background-color: var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .compact-details ul {
+            padding: 0.75rem 1rem;
+            background-color: var(--card-bg);
+        }
+        
+        .compact-details li {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .compact-details li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .priority-high {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .priority-medium {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .priority-low {
+            border-left: 4px solid var(--success);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-tab {
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-weight: 500;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+        
+        .section-tab.active {
+            background-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+            border-color: var(--accent);
+        }
+        
+        .quick-action {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+        
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .compact-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        
+        .compact-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .compact-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .compact-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .progress-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .btn-reset {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+        
+        .btn-reset:hover {
+            transform: scale(1.05);
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background: var(--danger);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+            z-index: 100;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+        }
+        
+        .topic-count {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Floating Action Button -->
+    <div class="floating-btn" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <div class="section-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold gradient-text">GATE ECE Preparation Tracker</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Track your progress efficiently with PrepFusion</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeToggle" class="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    <i class="fas fa-moon text-gray-700 dark:text-yellow-400"></i>
+                </button>
+                
+                <!-- Export Button -->
+                <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
+                    <i class="fas fa-download text-blue-600 dark:text-blue-400"></i>
+                    <span class="font-medium">Export</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <!-- Left Column - Progress & Controls -->
+            <div class="xl:col-span-1 space-y-6">
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="stats-card p-4 text-center">
+                        <div class="text-2xl font-bold" id="total-percentage">0%</div>
+                        <div class="text-sm opacity-90 mt-1">Overall Progress</div>
+                    </div>
+                    <div class="content-card p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="completed-topics">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Completed</div>
+                    </div>
+                    <div class="content-card p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600" id="remaining-topics">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Remaining</div>
+                    </div>
+                    <div class="content-card p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="days-remaining">-</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Days Left</div>
+                    </div>
+                </div>
+
+                <!-- Total Progress Card -->
+                <div class="content-card p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Preparation Progress</h2>
+                        <button id="reset-all" class="btn-reset">Reset All</button>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-3 overflow-hidden">
+                        <div id="bar-total" class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 h-4 rounded-full progress-bar flex items-center justify-end pr-3 text-white text-xs font-medium" style="width:0%"></div>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        <span>Syllabus: <span id="sec1-summary" class="font-semibold">0%</span></span>
+                        <span>PYQs: <span id="sec2-summary" class="font-semibold">0%</span></span>
+                        <span>Tests: <span id="sec3-summary" class="font-semibold">0%</span></span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="content-card p-5">
+                    <h3 class="text-lg font-semibold mb-3">Quick Actions</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="mark-high-priority" class="quick-action">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Priority
+                        </button>
+                        <button id="focus-weak-areas" class="quick-action">
+                            <i class="fas fa-bullseye mr-1"></i> Weak Areas
+                        </button>
+                        <button id="suggest-next" class="quick-action">
+                            <i class="fas fa-forward mr-1"></i> Next Topic
+                        </button>
+                        <button id="view-schedule" class="quick-action">
+                            <i class="fas fa-calendar mr-1"></i> Schedule
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Achievement Badges -->
+                <div class="content-card p-5">
+                    <h3 class="text-lg font-semibold mb-3">Achievements</h3>
+                    <div class="flex flex-wrap gap-2" id="achievement-badges">
+                        <!-- Badges will be added dynamically -->
+                        <div class="achievement-badge">🚀 Getting Started</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Content Tabs -->
+            <div class="xl:col-span-3 content-card p-5">
+                <!-- Tabs Navigation -->
+                <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                    <button class="section-tab flex-1 text-center active" data-tab="syllabus">
+                        <i class="fas fa-book mr-2"></i>Syllabus
+                    </button>
+                    <button class="section-tab flex-1 text-center" data-tab="pyqs">
+                        <i class="fas fa-history mr-2"></i>PYQs
+                    </button>
+                    <button class="section-tab flex-1 text-center" data-tab="tests">
+                        <i class="fas fa-clipboard-list mr-2"></i>Test Series
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="h-[600px] overflow-hidden">
+                    <!-- Syllabus Tab -->
+                    <div id="syllabus-tab" class="tab-content active h-full overflow-y-auto compact-scroll pr-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-blue-600">Syllabus Completion</h2>
+                            <div class="flex items-center">
+                                <span id="sec1-progress" class="text-xl font-bold text-blue-600 mr-3">0%</span>
+                                <button class="btn-reset reset-section" data-section="sec1">Reset</button>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                            <div id="bar-sec1" class="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                        </div>
+                        
+                        <!-- Section 1 Topics in a compact grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="syllabus-content">
+                            <!-- Content will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- PYQs Tab -->
+                    <div id="pyqs-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-green-600">Previous Year Questions</h2>
+                            <div class="flex items-center">
+                                <span id="sec2-progress" class="text-xl font-bold text-green-600 mr-3">0%</span>
+                                <button class="btn-reset reset-section" data-section="sec2">Reset</button>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                            <div id="bar-sec2" class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="pyqs-content">
+                            <!-- Content will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Test Series Tab -->
+                    <div id="tests-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-purple-600">Test Series</h2>
+                            <div class="flex items-center">
+                                <span id="sec3-progress" class="text-xl font-bold text-purple-600 mr-3">0%</span>
+                                <button class="btn-reset reset-section" data-section="sec3">Reset</button>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                            <div id="bar-sec3" class="bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="tests-content">
+                            <!-- Content will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
+            <p>GATE ECE Preparation Tracker by PrepFusion</p>
+            <p class="mt-1">Your progress is automatically saved in your browser</p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== CONFIGURATION =====
+        const CONFIG = {
+            GATE_DATE: '2025-02-01',
+            ACHIEVEMENTS: [
+                { threshold: 10, text: 'Getting Started', icon: '🚀' },
+                { threshold: 25, text: 'Making Progress', icon: '📈' },
+                { threshold: 50, text: 'Halfway There', icon: '🎯' },
+                { threshold: 75, text: 'Almost Done', icon: '🔥' },
+                { threshold: 90, text: 'GATE Ready', icon: '🏆' },
+                { threshold: 100, text: 'Perfect Score', icon: '💯' }
+            ],
+            TOPIC_MILESTONES: [10, 25, 50]
+        };
+
+        // ===== DATA MODELS =====
+        const SYLLABUS_DATA = [
+            {
+                title: "Network Analysis (4.8%)",
+                priority: "high",
+                topics: [
+                    { name: "Basics of Networks & Network Theorems (1.2%)", weight: 1.2 },
+                    { name: "Transient Analysis (1.8%)", weight: 1.8 },
+                    { name: "AC Circuits - Phasor Diagram, Resonance & Complex Power (0.6%)", weight: 0.6 },
+                    { name: "Two Port Networks (1.2%)", weight: 1.2 }
+                ]
+            },
+            {
+                title: "Signals & Systems (6%)",
+                priority: "high",
+                topics: [
+                    { name: "Basics of Signals & Systems (1.5%)", weight: 1.5 },
+                    { name: "Continuous Time Fourier Series (0.5%)", weight: 0.5 },
+                    { name: "Continuous Time Fourier Transforms (1%)", weight: 1 },
+                    { name: "Laplace Transforms (1%)", weight: 1 },
+                    { name: "Z Transforms (1%)", weight: 1 },
+                    { name: "DTFS, DTFT, DFT, FFT (1%)", weight: 1 }
+                ]
+            },
+            {
+                title: "Analog Electronics (6%)",
+                priority: "medium",
+                topics: [
+                    { name: "Diode Circuits (1%)", weight: 1 },
+                    { name: "MOSFETs (2%)", weight: 2 },
+                    { name: "OpAmps (2%)", weight: 2 },
+                    { name: "BJTs (1%)", weight: 1 }
+                ]
+            },
+            {
+                title: "Digital Electronics (4.8%)",
+                priority: "medium",
+                topics: [
+                    { name: "Basics of Boolean Algebra & Logic Gates (1%)", weight: 1 },
+                    { name: "Basics of Number Systems (0.4%)", weight: 0.4 },
+                    { name: "Combinational Circuits (0.8%)", weight: 0.8 },
+                    { name: "Sequential Circuits (1%)", weight: 1 },
+                    { name: "ADC & DAC (1%)", weight: 1 },
+                    { name: "CMOS Logic Implementation (0.4%)", weight: 0.4 },
+                    { name: "COA (0.2%)", weight: 0.2 }
+                ]
+            },
+            {
+                title: "Control System (4.8%)",
+                priority: "medium",
+                topics: [
+                    { name: "Basics of Control System (0.2%)", weight: 0.2 },
+                    { name: "Signal Flow Graph & Block Diagram Reduction (0.2%)", weight: 0.2 },
+                    { name: "Time Response Analysis (0.5%)", weight: 0.5 },
+                    { name: "Routh-Hurwitz Criterion (0.4%)", weight: 0.4 },
+                    { name: "Root Locus Analysis (0.4%)", weight: 0.4 },
+                    { name: "Frequency Response of 2nd Order Systems (0.2%)", weight: 0.2 },
+                    { name: "Polar Plot (0.6%)", weight: 0.6 },
+                    { name: "Nyquist Plot (0.6%)", weight: 0.6 },
+                    { name: "Bode Plots (0.6%)", weight: 0.6 },
+                    { name: "State Space Analysis (0.6%)", weight: 0.6 },
+                    { name: "Controllers and Compensators (0.5%)", weight: 0.5 }
+                ]
+            },
+            {
+                title: "Engineering Mathematics (7.8%)",
+                priority: "low",
+                topics: [
+                    { name: "Linear Algebra (1.8%)", weight: 1.8 },
+                    { name: "Limits, Continuity & Differentiability (0.5%)", weight: 0.5 },
+                    { name: "Differential Calculus (1.25%)", weight: 1.25 },
+                    { name: "Integral Calculus (1.25%)", weight: 1.25 },
+                    { name: "Differential Equations (0.3%)", weight: 0.3 },
+                    { name: "Vector Calculus (0.45%)", weight: 0.45 },
+                    { name: "Complex Variable Analysis (0.45%)", weight: 0.45 },
+                    { name: "Probability and Statistics (1.8%)", weight: 1.8 }
+                ]
+            },
+            {
+                title: "General Aptitude (9%)",
+                priority: "low",
+                topics: [
+                    { name: "Verbal Aptitude (1.6%)", weight: 1.6 },
+                    { name: "Quantitative Aptitude (3.8%)", weight: 3.8 },
+                    { name: "Analytical Aptitude (2.4%)", weight: 2.4 },
+                    { name: "Spatial Aptitude (1.2%)", weight: 1.2 }
+                ]
+            },
+            {
+                title: "Electromagnetic Field Theory (4.2%)",
+                priority: "medium",
+                topics: [
+                    { name: "Vector Algebra, Coordinate system & Calculus (0.5%)", weight: 0.5 },
+                    { name: "Maxwell's Equation & EM waves (1%)", weight: 1 },
+                    { name: "Transmission Lines & Smith Chart (1.5%)", weight: 1.5 },
+                    { name: "Waveguides (0.7%)", weight: 0.7 },
+                    { name: "Antenna Theory (0.5%)", weight: 0.5 }
+                ]
+            },
+            {
+                title: "Electronic Devices & Circuits (5.4%)",
+                priority: "high",
+                topics: [
+                    { name: "Basic Semiconductor Physics (2.16%)", weight: 2.16 },
+                    { name: "PN Junction & Special Purpose Diodes (1.08%)", weight: 1.08 },
+                    { name: "Bipolar Junction Transistors (0.54%)", weight: 0.54 },
+                    { name: "MOS Cap & MOS Physics (1.62%)", weight: 1.62 }
+                ]
+            },
+            {
+                title: "Communication Systems (7.2%)",
+                priority: "high",
+                topics: [
+                    { name: "Random Variable & Random Process (1.5%)", weight: 1.5 },
+                    { name: "Digital Communication Systems (2.5%)", weight: 2.5 },
+                    { name: "Information Theory (1.8%)", weight: 1.8 },
+                    { name: "Analog Communication Systems (1.4%)", weight: 1.4 }
+                ]
+            }
+        ];
+
+        const PYQS_DATA = [
+            { name: "Network Analysis (2%)", weight: 2 },
+            { name: "Signals & Systems (2%)", weight: 2 },
+            { name: "Control Systems (2%)", weight: 2 },
+            { name: "Analog Electronics (2%)", weight: 2 },
+            { name: "Digital Electronics & COA (2%)", weight: 2 },
+            { name: "Engineering Mathematics (2%)", weight: 2 },
+            { name: "General Aptitude (2%)", weight: 2 },
+            { name: "Electromagnetic Field Theory (2%)", weight: 2 },
+            { name: "Electronic Devices & Circuits (2%)", weight: 2 },
+            { name: "Communication Systems (2%)", weight: 2 }
+        ];
+
+        const TESTS_DATA = [
+            { name: "Network Analysis Tests (1%)", weight: 1 },
+            { name: "Signals & Systems Tests (1%)", weight: 1 },
+            { name: "Control Systems Tests (1%)", weight: 1 },
+            { name: "Analog Electronics Tests (1%)", weight: 1 },
+            { name: "Digital Electronics & COA Tests (1%)", weight: 1 },
+            { name: "Engineering Mathematics Tests (1%)", weight: 1 },
+            { name: "General Aptitude Tests (1%)", weight: 1 },
+            { name: "Electromagnetic Field Theory Tests (1%)", weight: 1 },
+            { name: "Electronic Devices & Circuits Tests (1%)", weight: 1 },
+            { name: "Communication Systems Tests (1%)", weight: 1 },
+            { name: "Full Length - 1 (2%)", weight: 2 },
+            { name: "Full Length - 2 (2%)", weight: 2 },
+            { name: "Full Length - 3 (2%)", weight: 2 },
+            { name: "Full Length - 4 (2%)", weight: 2 },
+            { name: "Full Length - 5 (2%)", weight: 2 }
+        ];
+
+        // ===== UTILITY FUNCTIONS =====
+        const Utils = {
+            showToast(message, isError = false) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${isError ? 'error' : ''} show`;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            },
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            calculateDaysRemaining() {
+                const gateDate = new Date(CONFIG.GATE_DATE);
+                const today = new Date();
+                const diffTime = gateDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays > 0 ? diffDays : 0;
+            }
+        };
+
+        // ===== CORE APPLICATION =====
+        class GATETracker {
+            constructor() {
+                this.checkboxIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadUserState();
+                this.renderContent();
+                this.updateDisplay();
+            }
+
+            setupEventListeners() {
+                // Dark Mode
+                document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
+                
+                // Quick Actions
+                document.getElementById('mark-high-priority').addEventListener('click', () => this.markHighPriority());
+                document.getElementById('focus-weak-areas').addEventListener('click', () => this.focusWeakAreas());
+                document.getElementById('suggest-next').addEventListener('click', () => this.suggestNextTopic());
+                document.getElementById('view-schedule').addEventListener('click', () => this.viewSchedule());
+                document.getElementById('export-progress').addEventListener('click', () => this.exportProgress());
+                
+                // Reset Buttons
+                document.getElementById('reset-all').addEventListener('click', () => this.resetAllProgress());
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('reset-section')) {
+                        this.resetSectionProgress(e.target.dataset.section);
+                    }
+                });
+
+                // Tabs
+                document.querySelectorAll('.section-tab').forEach(tab => {
+                    tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                });
+
+                // Scroll to top
+                document.getElementById('scrollToTop').addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                // Debounced save for checkbox changes
+                const debouncedSave = Utils.debounce(() => this.saveUserProgress(), 500);
+                document.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('sec1-topic') || 
+                        e.target.classList.contains('sec2-topic') || 
+                        e.target.classList.contains('sec3-topic')) {
+                        this.updateProgress(e.target.closest('.tab-content').id.replace('-tab', ''));
+                        debouncedSave();
+                    }
+                });
+            }
+
+            toggleDarkMode() {
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                const icon = darkModeToggle.querySelector('i');
+                
+                document.body.classList.toggle('dark-mode');
+                
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                    Utils.showToast('Dark mode enabled');
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    icon.classList.replace('fa-sun', 'fa-moon');
+                    Utils.showToast('Light mode enabled');
+                }
+            }
+
+            loadUserState() {
+                // Load dark mode preference
+                if (localStorage.getItem('darkMode') === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('darkModeToggle').querySelector('i').classList.replace('fa-moon', 'fa-sun');
+                }
+                
+                // Load user progress
+                this.loadUserProgress();
+                
+                // Update days remaining
+                document.getElementById('days-remaining').textContent = Utils.calculateDaysRemaining();
+            }
+
+            renderContent() {
+                this.renderSyllabus();
+                this.renderPYQs();
+                this.renderTests();
+            }
+
+            renderSyllabus() {
+                const container = document.getElementById('syllabus-content');
+                let html = '';
+                
+                // Split syllabus into two columns
+                const midPoint = Math.ceil(SYLLABUS_DATA.length / 2);
+                const firstColumn = SYLLABUS_DATA.slice(0, midPoint);
+                const secondColumn = SYLLABUS_DATA.slice(midPoint);
+                
+                html += '<div class="space-y-3">';
+                firstColumn.forEach(section => {
+                    html += this.renderSyllabusSection(section);
+                });
+                html += '</div>';
+                
+                html += '<div class="space-y-3">';
+                secondColumn.forEach(section => {
+                    html += this.renderSyllabusSection(section);
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+            }
+
+            renderSyllabusSection(section) {
+                return `
+                    <details class="compact-details priority-${section.priority}">
+                        <summary>
+                            <span>${section.title}</span>
+                            <span class="topic-count">${section.topics.length}</span>
+                        </summary>
+                        <ul>
+                            ${section.topics.map(topic => `
+                                <li>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sec1-topic topic-checkbox" data-weight="${topic.weight}">
+                                        <span class="ml-2">${topic.name}</span>
+                                    </label>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </details>
+                `;
+            }
+
+            renderPYQs() {
+                const container = document.getElementById('pyqs-content');
+                container.innerHTML = PYQS_DATA.map(item => `
+                    <label class="flex items-center cursor-pointer bg-green-50 dark:bg-green-900 p-3 rounded-lg border border-green-100 dark:border-green-800">
+                        <input type="checkbox" class="sec2-topic topic-checkbox" data-weight="${item.weight}">
+                        <span class="ml-2 font-medium">${item.name}</span>
+                    </label>
+                `).join('');
+            }
+
+            renderTests() {
+                const container = document.getElementById('tests-content');
+                container.innerHTML = TESTS_DATA.map(item => `
+                    <label class="flex items-center cursor-pointer bg-purple-50 dark:bg-purple-900 p-3 rounded-lg border border-purple-100 dark:border-purple-800">
+                        <input type="checkbox" class="sec3-topic topic-checkbox" data-weight="${item.weight}">
+                        <span class="ml-2 font-medium">${item.name}</span>
+                    </label>
+                `).join('');
+            }
+
+            updateProgress(section) {
+                let total = 0;
+                const checkboxes = document.querySelectorAll(`.${section}-topic`);
+                
+                checkboxes.forEach(cb => {
+                    if (cb.checked) total += parseFloat(cb.dataset.weight);
+                });
+                
+                // Update UI
+                const sectionNum = section.charAt(3);
+                document.getElementById(`sec${sectionNum}-progress`).textContent = total.toFixed(1) + '%';
+                document.getElementById(`bar-sec${sectionNum}`).style.width = total + '%';
+                document.getElementById(`sec${sectionNum}-summary`).textContent = total.toFixed(1) + '%';
+                
+                this.updateTotal();
+                this.updateTopicCounts();
+                this.updateAchievements();
+            }
+
+            updateTotal() {
+                const sec1 = parseFloat(document.getElementById('sec1-progress').textContent) || 0;
+                const sec2 = parseFloat(document.getElementById('sec2-progress').textContent) || 0;
+                const sec3 = parseFloat(document.getElementById('sec3-progress').textContent) || 0;
+                const total = sec1 + sec2 + sec3;
+                
+                document.getElementById('total-progress').textContent = total.toFixed(1) + '%';
+                document.getElementById('total-percentage').textContent = total.toFixed(1) + '%';
+                document.getElementById('bar-total').style.width = total + '%';
+            }
+
+            updateTopicCounts() {
+                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                let completed = 0;
+                
+                allCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) completed++;
+                });
+                
+                document.getElementById('completed-topics').textContent = completed;
+                document.getElementById('remaining-topics').textContent = allCheckboxes.length - completed;
+            }
+
+            updateAchievements() {
+                const totalProgress = parseFloat(document.getElementById('total-progress').textContent);
+                const completedTopics = parseInt(document.getElementById('completed-topics').textContent);
+                const badgesContainer = document.getElementById('achievement-badges');
+                
+                let badgesHTML = '';
+                
+                // Progress-based achievements
+                CONFIG.ACHIEVEMENTS.forEach(achievement => {
+                    if (totalProgress >= achievement.threshold) {
+                        badgesHTML += `<div class="achievement-badge">${achievement.icon} ${achievement.text}</div>`;
+                    }
+                });
+                
+                // Topic completion milestones
+                CONFIG.TOPIC_MILESTONES.forEach(milestone => {
+                    if (completedTopics >= milestone) {
+                        badgesHTML += `<div class="achievement-badge">📚 ${milestone} Topics</div>`;
+                    }
+                });
+                
+                badgesContainer.innerHTML = badgesHTML;
+            }
+
+            updateDisplay() {
+                ['sec1', 'sec2', 'sec3'].forEach(section => this.updateProgress(section));
+            }
+
+            markHighPriority() {
+                const highPriorityTopics = document.querySelectorAll('.priority-high');
+                highPriorityTopics.forEach(topic => {
+                    topic.open = true;
+                });
+                Utils.showToast('High priority topics expanded for focus!');
+            }
+
+            focusWeakAreas() {
+                const allCheckboxes = document.querySelectorAll('.sec1-topic');
+                const weakAreas = [];
+                
+                allCheckboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        weakAreas.push(checkbox.parentElement);
+                    }
+                });
+                
+                if (weakAreas.length > 0) {
+                    // Close all sections first
+                    document.querySelectorAll('details').forEach(detail => {
+                        detail.open = false;
+                    });
+                    
+                    // Open sections with weak areas
+                    weakAreas.forEach(area => {
+                        const details = area.closest('details');
+                        if (details) details.open = true;
+                    });
+                    
+                    Utils.showToast(`Found ${weakAreas.length} topics that need attention!`);
+                } else {
+                    Utils.showToast('Congratulations! You have no weak areas.');
+                }
+            }
+
+            suggestNextTopic() {
+                const allCheckboxes = document.querySelectorAll('.sec1-topic');
+                const uncompleted = [];
+                
+                allCheckboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        uncompleted.push({
+                            checkbox: checkbox,
+                            weight: parseFloat(checkbox.dataset.weight),
+                            priority: checkbox.closest('.priority-high') ? 3 : 
+                                     checkbox.closest('.priority-medium') ? 2 : 1
+                        });
+                    }
+                });
+                
+                if (uncompleted.length > 0) {
+                    // Sort by priority and weight
+                    uncompleted.sort((a, b) => {
+                        if (a.priority !== b.priority) return b.priority - a.priority;
+                        return b.weight - a.weight;
+                    });
+                    
+                    const nextTopic = uncompleted[0];
+                    const topicName = nextTopic.checkbox.parentElement.textContent.trim();
+                    
+                    // Open the section
+                    const details = nextTopic.checkbox.closest('details');
+                    if (details) details.open = true;
+                    
+                    Utils.showToast(`Next recommended: ${topicName} (${nextTopic.priority === 3 ? 'High' : nextTopic.priority === 2 ? 'Medium' : 'Low'} priority)`);
+                } else {
+                    Utils.showToast('Congratulations! All topics are completed.');
+                }
+            }
+
+            viewSchedule() {
+                Utils.showToast('Study schedule feature coming soon!');
+            }
+
+            exportProgress() {
+                const progressData = {
+                    totalProgress: document.getElementById('total-progress').textContent,
+                    syllabusProgress: document.getElementById('sec1-progress').textContent,
+                    pyqProgress: document.getElementById('sec2-progress').textContent,
+                    testProgress: document.getElementById('sec3-progress').textContent,
+                    completedTopics: document.getElementById('completed-topics').textContent,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", `gate_ece_progress_${new Date().toISOString().split('T')[0]}.json`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+                
+                Utils.showToast('Progress exported successfully!');
+            }
+
+            resetSectionProgress(section) {
+                const checkboxes = document.querySelectorAll(`.${section}-topic`);
+                
+                if (checkboxes.length > 0 && confirm(`Reset all progress in ${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'}?`)) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    this.updateProgress(section);
+                    this.saveUserProgress();
+                    Utils.showToast(`${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'} progress reset`);
+                }
+            }
+
+            resetAllProgress() {
+                if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    allCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    ['sec1','sec2','sec3'].forEach(section => this.updateProgress(section));
+                    this.saveUserProgress();
+                    Utils.showToast('All progress reset successfully');
+                }
+            }
+
+            switchTab(tabName) {
+                // Update tabs
+                document.querySelectorAll('.section-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabName);
+                });
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.toggle('active', content.id === `${tabName}-tab`);
+                });
+            }
+
+            saveUserProgress() {
+                const progressData = {};
+                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                
+                allCheckboxes.forEach((checkbox, index) => {
+                    progressData[`checkbox_${index}`] = checkbox.checked;
+                });
+                
+                localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
+            }
+
+            loadUserProgress() {
+                const savedProgress = localStorage.getItem('gate_ece_progress');
+                
+                if (savedProgress) {
+                    const progressData = JSON.parse(savedProgress);
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    
+                    allCheckboxes.forEach((checkbox, index) => {
+                        if (progressData[`checkbox_${index}`] !== undefined) {
+                            checkbox.checked = progressData[`checkbox_${index}`];
+                        }
+                    });
+                    
+                    this.updateDisplay();
+                }
+            }
+        }
+
+        // ===== INITIALIZE APPLICATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            new GATETracker();
+        });
+    </script>
+</body>
+</html>

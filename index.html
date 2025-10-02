@@ -7,8 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+        /* CSS Styles - Can be moved to a separate file */
         :root {
             --bg-primary: #f8fafc;
             --bg-secondary: #e2e8f0;
@@ -40,18 +39,6 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
             min-height: 100vh;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dark-mode .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .progress-bar {
@@ -131,24 +118,6 @@
             color: white;
             border-radius: 16px;
             box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
-            transition: transform 0.3s;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .achievement-badge {
-            display: inline-flex;
-            align-items: center;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #78350f;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .section-tab {
@@ -166,26 +135,6 @@
             background-color: var(--accent);
             color: white;
             box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-            border-color: var(--accent);
-        }
-        
-        .quick-action {
-            font-size: 0.85rem;
-            padding: 0.5rem 0.8rem;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-        }
-        
-        .quick-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-color: var(--accent);
-            color: white;
             border-color: var(--accent);
         }
         
@@ -215,17 +164,6 @@
             overflow: hidden;
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-        }
-        
-        .progress-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        
-        .progress-value {
-            font-size: 1.1rem;
-            font-weight: 700;
         }
         
         .btn-reset {
@@ -278,52 +216,6 @@
             background: var(--danger);
         }
         
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
-            z-index: 100;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .floating-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 20px rgba(59, 130, 246, 0.4);
-        }
-        
         .section-icon {
             width: 40px;
             height: 40px;
@@ -352,24 +244,39 @@
             -webkit-text-fill-color: transparent;
         }
         
-        .progress-ring {
-            transform: rotate(-90deg);
+        .compact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
         }
         
-        .progress-ring-circle {
-            transition: stroke-dashoffset 0.5s ease;
-            transform-origin: 50% 50%;
+        @media (min-width: 1024px) {
+            .compact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .daily-target {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .target-input {
+            width: 60px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            text-align: center;
         }
     </style>
 </head>
 <body class="p-4">
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
-
-    <!-- Floating Action Button -->
-    <div class="floating-btn" id="scrollToTop">
-        <i class="fas fa-arrow-up"></i>
-    </div>
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -437,32 +344,21 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
+                <!-- Daily Study Target -->
                 <div class="content-card p-5">
-                    <h3 class="text-lg font-semibold mb-3">Quick Actions</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="mark-high-priority" class="quick-action">
-                            <i class="fas fa-exclamation-circle mr-1"></i> Priority
-                        </button>
-                        <button id="focus-weak-areas" class="quick-action">
-                            <i class="fas fa-bullseye mr-1"></i> Weak Areas
-                        </button>
-                        <button id="suggest-next" class="quick-action">
-                            <i class="fas fa-forward mr-1"></i> Next Topic
-                        </button>
-                        <button id="view-schedule" class="quick-action">
-                            <i class="fas fa-calendar mr-1"></i> Schedule
-                        </button>
+                    <h3 class="text-lg font-semibold mb-3">Daily Study Target</h3>
+                    <div class="daily-target">
+                        <span>Topics to complete today:</span>
+                        <input type="number" id="daily-target-input" class="target-input" value="3" min="1" max="10">
                     </div>
-                </div>
-
-                <!-- Achievement Badges -->
-                <div class="content-card p-5">
-                    <h3 class="text-lg font-semibold mb-3">Achievements</h3>
-                    <div class="flex flex-wrap gap-2" id="achievement-badges">
-                        <!-- Badges will be added dynamically -->
-                        <div class="achievement-badge">🚀 Getting Started</div>
+                    <div class="flex items-center justify-between">
+                        <span>Today's progress:</span>
+                        <span id="today-progress">0/3</span>
                     </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2 overflow-hidden">
+                        <div id="today-progress-bar" class="bg-green-500 h-2 rounded-full progress-bar" style="width:0%"></div>
+                    </div>
+                    <button id="reset-daily-progress" class="btn-reset w-full mt-3">Reset Daily Progress</button>
                 </div>
             </div>
 
@@ -497,7 +393,7 @@
                         </div>
                         
                         <!-- Section 1 Topics in a compact grid -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="syllabus-content">
+                        <div class="compact-grid" id="syllabus-content">
                             <!-- Content will be loaded dynamically -->
                         </div>
                     </div>
@@ -548,20 +444,14 @@
 
     <script>
         // ===== CONFIGURATION =====
+        // This section can be moved to a separate config.js file
         const CONFIG = {
             GATE_DATE: '2025-02-01',
-            ACHIEVEMENTS: [
-                { threshold: 10, text: 'Getting Started', icon: '🚀' },
-                { threshold: 25, text: 'Making Progress', icon: '📈' },
-                { threshold: 50, text: 'Halfway There', icon: '🎯' },
-                { threshold: 75, text: 'Almost Done', icon: '🔥' },
-                { threshold: 90, text: 'GATE Ready', icon: '🏆' },
-                { threshold: 100, text: 'Perfect Score', icon: '💯' }
-            ],
-            TOPIC_MILESTONES: [10, 25, 50]
+            DEFAULT_DAILY_TARGET: 3
         };
 
         // ===== DATA MODELS =====
+        // This section can be moved to a separate data.js file
         const SYLLABUS_DATA = [
             {
                 title: "Network Analysis (4.8%)",
@@ -714,6 +604,7 @@
         ];
 
         // ===== UTILITY FUNCTIONS =====
+        // This section can be moved to a separate utils.js file
         const Utils = {
             showToast(message, isError = false) {
                 const toast = document.getElementById('toast');
@@ -747,9 +638,12 @@
         };
 
         // ===== CORE APPLICATION =====
+        // This section can be moved to a separate app.js file
         class GATETracker {
             constructor() {
                 this.checkboxIndex = 0;
+                this.dailyCompleted = 0;
+                this.dailyTarget = CONFIG.DEFAULT_DAILY_TARGET;
                 this.init();
             }
 
@@ -758,17 +652,14 @@
                 this.loadUserState();
                 this.renderContent();
                 this.updateDisplay();
+                this.updateDailyProgress();
             }
 
             setupEventListeners() {
                 // Dark Mode
                 document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
                 
-                // Quick Actions
-                document.getElementById('mark-high-priority').addEventListener('click', () => this.markHighPriority());
-                document.getElementById('focus-weak-areas').addEventListener('click', () => this.focusWeakAreas());
-                document.getElementById('suggest-next').addEventListener('click', () => this.suggestNextTopic());
-                document.getElementById('view-schedule').addEventListener('click', () => this.viewSchedule());
+                // Export Button
                 document.getElementById('export-progress').addEventListener('click', () => this.exportProgress());
                 
                 // Reset Buttons
@@ -783,19 +674,40 @@
                 document.querySelectorAll('.section-tab').forEach(tab => {
                     tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
                 });
-
-                // Scroll to top
-                document.getElementById('scrollToTop').addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Daily Target
+                document.getElementById('daily-target-input').addEventListener('change', (e) => {
+                    this.dailyTarget = parseInt(e.target.value) || CONFIG.DEFAULT_DAILY_TARGET;
+                    this.updateDailyProgress();
+                    this.saveUserProgress();
+                });
+                
+                // Reset Daily Progress
+                document.getElementById('reset-daily-progress').addEventListener('click', () => {
+                    this.dailyCompleted = 0;
+                    this.updateDailyProgress();
+                    this.saveUserProgress();
+                    Utils.showToast('Daily progress reset');
                 });
 
                 // Debounced save for checkbox changes
-                const debouncedSave = Utils.debounce(() => this.saveUserProgress(), 500);
+                const debouncedSave = Utils.debounce(() => {
+                    this.saveUserProgress();
+                    this.updateDailyProgress();
+                }, 500);
+                
                 document.addEventListener('change', (e) => {
                     if (e.target.classList.contains('sec1-topic') || 
                         e.target.classList.contains('sec2-topic') || 
                         e.target.classList.contains('sec3-topic')) {
                         this.updateProgress(e.target.closest('.tab-content').id.replace('-tab', ''));
+                        
+                        // Check if this is a new completion today
+                        if (e.target.checked && !e.target.dataset.completedToday) {
+                            this.dailyCompleted++;
+                            e.target.dataset.completedToday = 'true';
+                        }
+                        
                         debouncedSave();
                     }
                 });
@@ -842,22 +754,9 @@
                 const container = document.getElementById('syllabus-content');
                 let html = '';
                 
-                // Split syllabus into two columns
-                const midPoint = Math.ceil(SYLLABUS_DATA.length / 2);
-                const firstColumn = SYLLABUS_DATA.slice(0, midPoint);
-                const secondColumn = SYLLABUS_DATA.slice(midPoint);
-                
-                html += '<div class="space-y-3">';
-                firstColumn.forEach(section => {
+                SYLLABUS_DATA.forEach(section => {
                     html += this.renderSyllabusSection(section);
                 });
-                html += '</div>';
-                
-                html += '<div class="space-y-3">';
-                secondColumn.forEach(section => {
-                    html += this.renderSyllabusSection(section);
-                });
-                html += '</div>';
                 
                 container.innerHTML = html;
             }
@@ -919,7 +818,6 @@
                 
                 this.updateTotal();
                 this.updateTopicCounts();
-                this.updateAchievements();
             }
 
             updateTotal() {
@@ -945,107 +843,27 @@
                 document.getElementById('remaining-topics').textContent = allCheckboxes.length - completed;
             }
 
-            updateAchievements() {
-                const totalProgress = parseFloat(document.getElementById('total-progress').textContent);
-                const completedTopics = parseInt(document.getElementById('completed-topics').textContent);
-                const badgesContainer = document.getElementById('achievement-badges');
-                
-                let badgesHTML = '';
-                
-                // Progress-based achievements
-                CONFIG.ACHIEVEMENTS.forEach(achievement => {
-                    if (totalProgress >= achievement.threshold) {
-                        badgesHTML += `<div class="achievement-badge">${achievement.icon} ${achievement.text}</div>`;
-                    }
-                });
-                
-                // Topic completion milestones
-                CONFIG.TOPIC_MILESTONES.forEach(milestone => {
-                    if (completedTopics >= milestone) {
-                        badgesHTML += `<div class="achievement-badge">📚 ${milestone} Topics</div>`;
-                    }
-                });
-                
-                badgesContainer.innerHTML = badgesHTML;
-            }
-
             updateDisplay() {
                 ['sec1', 'sec2', 'sec3'].forEach(section => this.updateProgress(section));
             }
-
-            markHighPriority() {
-                const highPriorityTopics = document.querySelectorAll('.priority-high');
-                highPriorityTopics.forEach(topic => {
-                    topic.open = true;
-                });
-                Utils.showToast('High priority topics expanded for focus!');
-            }
-
-            focusWeakAreas() {
-                const allCheckboxes = document.querySelectorAll('.sec1-topic');
-                const weakAreas = [];
+            
+            updateDailyProgress() {
+                document.getElementById('today-progress').textContent = `${this.dailyCompleted}/${this.dailyTarget}`;
+                const progressPercent = (this.dailyCompleted / this.dailyTarget) * 100;
+                document.getElementById('today-progress-bar').style.width = `${Math.min(progressPercent, 100)}%`;
                 
-                allCheckboxes.forEach(checkbox => {
-                    if (!checkbox.checked) {
-                        weakAreas.push(checkbox.parentElement);
-                    }
-                });
-                
-                if (weakAreas.length > 0) {
-                    // Close all sections first
-                    document.querySelectorAll('details').forEach(detail => {
-                        detail.open = false;
-                    });
-                    
-                    // Open sections with weak areas
-                    weakAreas.forEach(area => {
-                        const details = area.closest('details');
-                        if (details) details.open = true;
-                    });
-                    
-                    Utils.showToast(`Found ${weakAreas.length} topics that need attention!`);
+                // Update progress bar color based on completion
+                const progressBar = document.getElementById('today-progress-bar');
+                if (progressPercent >= 100) {
+                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
+                    progressBar.classList.add('bg-green-500');
+                } else if (progressPercent >= 50) {
+                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
+                    progressBar.classList.add('bg-yellow-500');
                 } else {
-                    Utils.showToast('Congratulations! You have no weak areas.');
+                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
+                    progressBar.classList.add('bg-green-500');
                 }
-            }
-
-            suggestNextTopic() {
-                const allCheckboxes = document.querySelectorAll('.sec1-topic');
-                const uncompleted = [];
-                
-                allCheckboxes.forEach(checkbox => {
-                    if (!checkbox.checked) {
-                        uncompleted.push({
-                            checkbox: checkbox,
-                            weight: parseFloat(checkbox.dataset.weight),
-                            priority: checkbox.closest('.priority-high') ? 3 : 
-                                     checkbox.closest('.priority-medium') ? 2 : 1
-                        });
-                    }
-                });
-                
-                if (uncompleted.length > 0) {
-                    // Sort by priority and weight
-                    uncompleted.sort((a, b) => {
-                        if (a.priority !== b.priority) return b.priority - a.priority;
-                        return b.weight - a.weight;
-                    });
-                    
-                    const nextTopic = uncompleted[0];
-                    const topicName = nextTopic.checkbox.parentElement.textContent.trim();
-                    
-                    // Open the section
-                    const details = nextTopic.checkbox.closest('details');
-                    if (details) details.open = true;
-                    
-                    Utils.showToast(`Next recommended: ${topicName} (${nextTopic.priority === 3 ? 'High' : nextTopic.priority === 2 ? 'Medium' : 'Low'} priority)`);
-                } else {
-                    Utils.showToast('Congratulations! All topics are completed.');
-                }
-            }
-
-            viewSchedule() {
-                Utils.showToast('Study schedule feature coming soon!');
             }
 
             exportProgress() {
@@ -1114,7 +932,15 @@
                     progressData[`checkbox_${index}`] = checkbox.checked;
                 });
                 
+                // Save daily progress
+                const dailyData = {
+                    target: this.dailyTarget,
+                    completed: this.dailyCompleted,
+                    lastUpdated: new Date().toDateString()
+                };
+                
                 localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
+                localStorage.setItem('gate_ece_daily', JSON.stringify(dailyData));
             }
 
             loadUserProgress() {
@@ -1131,6 +957,22 @@
                     });
                     
                     this.updateDisplay();
+                }
+                
+                // Load daily progress
+                const savedDaily = localStorage.getItem('gate_ece_daily');
+                if (savedDaily) {
+                    const dailyData = JSON.parse(savedDaily);
+                    this.dailyTarget = dailyData.target || CONFIG.DEFAULT_DAILY_TARGET;
+                    this.dailyCompleted = dailyData.completed || 0;
+                    
+                    // Check if it's a new day
+                    const today = new Date().toDateString();
+                    if (dailyData.lastUpdated !== today) {
+                        this.dailyCompleted = 0;
+                    }
+                    
+                    document.getElementById('daily-target-input').value = this.dailyTarget;
                 }
             }
         }

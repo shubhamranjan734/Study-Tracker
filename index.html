@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* All the CSS styles remain exactly the same as before */
         :root {
             --bg-primary: #f8fafc;
             --bg-secondary: #e2e8f0;
@@ -798,6 +799,7 @@
                 this.checkboxIndex = 0;
                 this.dailyCompleted = 0;
                 this.dailyTarget = CONFIG.DEFAULT_DAILY_TARGET;
+                this.isLoading = true; // Add loading flag
                 this.init();
             }
 
@@ -805,8 +807,7 @@
                 this.setupEventListeners();
                 this.loadUserState();
                 this.renderContent();
-                this.updateDisplay();
-                this.updateDailyProgress();
+                // Update display will be called after content is rendered and data is loaded
             }
 
             setupEventListeners() {
@@ -849,8 +850,10 @@
 
                 // Debounced save for checkbox changes
                 const debouncedSave = Utils.debounce(() => {
-                    this.saveUserProgress();
-                    this.updateDailyProgress();
+                    if (!this.isLoading) { // Don't save during initial loading
+                        this.saveUserProgress();
+                        this.updateDailyProgress();
+                    }
                 }, 500);
                 
                 // Fix: Use event delegation for dynamically created checkboxes
@@ -866,10 +869,15 @@
                         
                         this.updateProgress(section);
                         
-                        // Check if this is a new completion today
+                        // FIX: Handle both checking and unchecking for daily progress
                         if (e.target.checked && !e.target.dataset.completedToday) {
+                            // New completion today
                             this.dailyCompleted++;
                             e.target.dataset.completedToday = 'true';
+                        } else if (!e.target.checked && e.target.dataset.completedToday) {
+                            // Topic was unchecked that was completed today
+                            this.dailyCompleted = Math.max(0, this.dailyCompleted - 1);
+                            delete e.target.dataset.completedToday;
                         }
                         
                         debouncedSave();
@@ -908,9 +916,6 @@
                     document.getElementById('darkModeToggle').querySelector('i').classList.replace('fa-moon', 'fa-sun');
                 }
                 
-                // Load user progress
-                this.loadUserProgress();
-                
                 // Update days remaining
                 document.getElementById('days-remaining').textContent = Utils.calculateDaysRemaining();
             }
@@ -919,6 +924,9 @@
                 this.renderSyllabus();
                 this.renderPYQs();
                 this.renderTests();
+                
+                // After rendering all content, load the saved progress
+                this.loadUserProgress();
             }
 
             renderSyllabus() {
@@ -943,7 +951,7 @@
                             ${section.topics.map(topic => `
                                 <li>
                                     <label class="flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sec1-topic topic-checkbox" data-weight="${topic.weight}">
+                                        <input type="checkbox" class="sec1-topic topic-checkbox" data-weight="${topic.weight}" data-topic-id="sec1_${topic.name.replace(/[^a-zA-Z0-9]/g, '_')}">
                                         <span class="ml-2">${topic.name}</span>
                                     </label>
                                 </li>
@@ -957,7 +965,7 @@
                 const container = document.getElementById('pyqs-content');
                 container.innerHTML = PYQS_DATA.map(item => `
                     <label class="flex items-center cursor-pointer bg-green-50 dark:bg-green-900 p-3 rounded-lg border border-green-100 dark:border-green-800">
-                        <input type="checkbox" class="sec2-topic topic-checkbox" data-weight="${item.weight}">
+                        <input type="checkbox" class="sec2-topic topic-checkbox" data-weight="${item.weight}" data-topic-id="sec2_${item.name.replace(/[^a-zA-Z0-9]/g, '_')}">
                         <span class="ml-2 font-medium">${item.name}</span>
                     </label>
                 `).join('');
@@ -967,7 +975,7 @@
                 const container = document.getElementById('tests-content');
                 container.innerHTML = TESTS_DATA.map(item => `
                     <label class="flex items-center cursor-pointer bg-purple-50 dark:bg-purple-900 p-3 rounded-lg border border-purple-100 dark:border-purple-800">
-                        <input type="checkbox" class="sec3-topic topic-checkbox" data-weight="${item.weight}">
+                        <input type="checkbox" class="sec3-topic topic-checkbox" data-weight="${item.weight}" data-topic-id="sec3_${item.name.replace(/[^a-zA-Z0-9]/g, '_')}">
                         <span class="ml-2 font-medium">${item.name}</span>
                     </label>
                 `).join('');
@@ -1173,9 +1181,15 @@
                     
                     if (checkboxes.length > 0 && confirm(`Reset all progress in ${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'}?`)) {
                         checkboxes.forEach(checkbox => {
+                            // FIX: Also remove completedToday flag when resetting section
+                            if (checkbox.dataset.completedToday) {
+                                this.dailyCompleted = Math.max(0, this.dailyCompleted - 1);
+                                delete checkbox.dataset.completedToday;
+                            }
                             checkbox.checked = false;
                         });
                         this.updateProgress(section);
+                        this.updateDailyProgress();
                         this.saveUserProgress();
                         Utils.showToast(`${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'} progress reset`);
                     }
@@ -1189,6 +1203,8 @@
                     if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
                         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
                         allCheckboxes.forEach(checkbox => {
+                            // FIX: Remove completedToday flag for all checkboxes
+                            delete checkbox.dataset.completedToday;
                             checkbox.checked = false;
                         });
                         
@@ -1223,22 +1239,31 @@
 
             saveUserProgress() {
                 try {
-                    const progressData = {};
-                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                    
-                    allCheckboxes.forEach((checkbox, index) => {
-                        progressData[`checkbox_${index}`] = checkbox.checked;
-                    });
-                    
-                    // Save daily progress
-                    const dailyData = {
-                        target: this.dailyTarget,
-                        completed: this.dailyCompleted,
-                        lastUpdated: new Date().toDateString()
+                    // Create a comprehensive progress data object
+                    const progressData = {
+                        // Save individual checkbox states with unique identifiers
+                        checkboxes: {},
+                        // Save daily progress
+                        dailyTarget: this.dailyTarget,
+                        dailyCompleted: this.dailyCompleted,
+                        // Save timestamp
+                        lastSaved: new Date().toISOString()
                     };
                     
+                    // Save each checkbox state with a unique identifier
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    allCheckboxes.forEach((checkbox) => {
+                        const topicId = checkbox.dataset.topicId;
+                        if (topicId) {
+                            progressData.checkboxes[topicId] = {
+                                checked: checkbox.checked,
+                                completedToday: checkbox.dataset.completedToday || false
+                            };
+                        }
+                    });
+                    
                     localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
-                    localStorage.setItem('gate_ece_daily', JSON.stringify(dailyData));
+                    console.log('Progress saved successfully', progressData);
                 } catch (error) {
                     console.error('Error saving user progress:', error);
                 }
@@ -1246,38 +1271,65 @@
 
             loadUserProgress() {
                 try {
+                    this.isLoading = true; // Set loading flag
+                    
                     const savedProgress = localStorage.getItem('gate_ece_progress');
                     
                     if (savedProgress) {
                         const progressData = JSON.parse(savedProgress);
-                        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                        console.log('Loading progress data:', progressData);
                         
-                        allCheckboxes.forEach((checkbox, index) => {
-                            if (progressData[`checkbox_${index}`] !== undefined) {
-                                checkbox.checked = progressData[`checkbox_${index}`];
-                            }
-                        });
-                        
-                        this.updateDisplay();
-                    }
-                    
-                    // Load daily progress
-                    const savedDaily = localStorage.getItem('gate_ece_daily');
-                    if (savedDaily) {
-                        const dailyData = JSON.parse(savedDaily);
-                        this.dailyTarget = dailyData.target || CONFIG.DEFAULT_DAILY_TARGET;
-                        this.dailyCompleted = dailyData.completed || 0;
-                        
-                        // Check if it's a new day
-                        const today = new Date().toDateString();
-                        if (dailyData.lastUpdated !== today) {
-                            this.dailyCompleted = 0;
+                        // Load daily progress
+                        if (progressData.dailyTarget !== undefined) {
+                            this.dailyTarget = progressData.dailyTarget;
+                            this.dailyCompleted = progressData.dailyCompleted || 0;
+                            document.getElementById('daily-target-input').value = this.dailyTarget;
                         }
                         
-                        document.getElementById('daily-target-input').value = this.dailyTarget;
+                        // Load checkbox states
+                        if (progressData.checkboxes) {
+                            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                            
+                            allCheckboxes.forEach(checkbox => {
+                                const topicId = checkbox.dataset.topicId;
+                                if (topicId && progressData.checkboxes[topicId]) {
+                                    checkbox.checked = progressData.checkboxes[topicId].checked;
+                                    if (progressData.checkboxes[topicId].completedToday) {
+                                        checkbox.dataset.completedToday = 'true';
+                                    } else {
+                                        delete checkbox.dataset.completedToday;
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Check if it's a new day and reset daily progress if needed
+                        const today = new Date().toDateString();
+                        if (progressData.lastSaved) {
+                            const lastSavedDate = new Date(progressData.lastSaved).toDateString();
+                            if (lastSavedDate !== today) {
+                                this.dailyCompleted = 0;
+                                // Clear completedToday flags for new day
+                                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                                allCheckboxes.forEach(checkbox => {
+                                    delete checkbox.dataset.completedToday;
+                                });
+                                this.saveUserProgress();
+                            }
+                        }
+                        
+                        // Update the display after loading all data
+                        this.updateDisplay();
+                        this.updateDailyProgress();
+                        
+                        console.log('Progress loaded successfully');
+                    } else {
+                        console.log('No saved progress found');
                     }
                 } catch (error) {
                     console.error('Error loading user progress:', error);
+                } finally {
+                    this.isLoading = false; // Clear loading flag
                 }
             }
         }

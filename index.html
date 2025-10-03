@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS Styles - Can be moved to a separate file */
         :root {
             --bg-primary: #f8fafc;
             --bg-secondary: #e2e8f0;
@@ -272,11 +271,142 @@
             color: var(--text-primary);
             text-align: center;
         }
+        
+        .import-export-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .file-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .file-input:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Fix for column height matching */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 1280px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 3fr;
+                align-items: start;
+            }
+        }
+        
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .right-column {
+            min-height: 100%;
+        }
+        
+        .right-column .content-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tab-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .tab-content-container {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="p-4">
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-xl font-bold">Import Progress Data</h2>
+                <button class="modal-close" id="closeImportModal">&times;</button>
+            </div>
+            <p class="mb-4 text-gray-600 dark:text-gray-400">
+                Select a previously exported JSON file to import your progress data.
+            </p>
+            <input type="file" id="importFile" class="file-input" accept=".json">
+            <div class="flex justify-end mt-4">
+                <button id="confirmImport" class="btn-reset bg-blue-500 text-white hover:bg-blue-600">Import Data</button>
+            </div>
+        </div>
+    </div>
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -296,18 +426,24 @@
                     <i class="fas fa-moon text-gray-700 dark:text-yellow-400"></i>
                 </button>
                 
-                <!-- Export Button -->
-                <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
-                    <i class="fas fa-download text-blue-600 dark:text-blue-400"></i>
-                    <span class="font-medium">Export</span>
-                </button>
+                <!-- Import/Export Buttons -->
+                <div class="import-export-buttons">
+                    <button id="import-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
+                        <i class="fas fa-upload text-blue-600 dark:text-blue-400"></i>
+                        <span class="font-medium">Import</span>
+                    </button>
+                    <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
+                        <i class="fas fa-download text-blue-600 dark:text-blue-400"></i>
+                        <span class="font-medium">Export</span>
+                    </button>
+                </div>
             </div>
         </header>
 
         <!-- Main Dashboard -->
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div class="dashboard-grid">
             <!-- Left Column - Progress & Controls -->
-            <div class="xl:col-span-1 space-y-6">
+            <div class="left-column">
                 <!-- Stats Overview -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="stats-card p-4 text-center">
@@ -363,72 +499,76 @@
             </div>
 
             <!-- Right Column - Content Tabs -->
-            <div class="xl:col-span-3 content-card p-5">
-                <!-- Tabs Navigation -->
-                <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
-                    <button class="section-tab flex-1 text-center active" data-tab="syllabus">
-                        <i class="fas fa-book mr-2"></i>Syllabus
-                    </button>
-                    <button class="section-tab flex-1 text-center" data-tab="pyqs">
-                        <i class="fas fa-history mr-2"></i>PYQs
-                    </button>
-                    <button class="section-tab flex-1 text-center" data-tab="tests">
-                        <i class="fas fa-clipboard-list mr-2"></i>Test Series
-                    </button>
-                </div>
+            <div class="right-column">
+                <div class="content-card p-5 h-full">
+                    <div class="tab-container">
+                        <!-- Tabs Navigation -->
+                        <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                            <button class="section-tab flex-1 text-center active" data-tab="syllabus">
+                                <i class="fas fa-book mr-2"></i>Syllabus
+                            </button>
+                            <button class="section-tab flex-1 text-center" data-tab="pyqs">
+                                <i class="fas fa-history mr-2"></i>PYQs
+                            </button>
+                            <button class="section-tab flex-1 text-center" data-tab="tests">
+                                <i class="fas fa-clipboard-list mr-2"></i>Test Series
+                            </button>
+                        </div>
 
-                <!-- Tab Contents -->
-                <div class="h-[600px] overflow-hidden">
-                    <!-- Syllabus Tab -->
-                    <div id="syllabus-tab" class="tab-content active h-full overflow-y-auto compact-scroll pr-2">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold text-blue-600">Syllabus Completion</h2>
-                            <div class="flex items-center">
-                                <span id="sec1-progress" class="text-xl font-bold text-blue-600 mr-3">0%</span>
-                                <button class="btn-reset reset-section" data-section="sec1">Reset</button>
+                        <!-- Tab Contents -->
+                        <div class="tab-content-container">
+                            <!-- Syllabus Tab -->
+                            <div id="syllabus-tab" class="tab-content active h-full overflow-y-auto compact-scroll pr-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold text-blue-600">Syllabus Completion</h2>
+                                    <div class="flex items-center">
+                                        <span id="sec1-progress" class="text-xl font-bold text-blue-600 mr-3">0%</span>
+                                        <button class="btn-reset reset-section" data-section="sec1">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                                    <div id="bar-sec1" class="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                                </div>
+                                
+                                <!-- Section 1 Topics in a compact grid -->
+                                <div class="compact-grid" id="syllabus-content">
+                                    <!-- Content will be loaded dynamically -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
-                            <div id="bar-sec1" class="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full progress-bar" style="width:0%"></div>
-                        </div>
-                        
-                        <!-- Section 1 Topics in a compact grid -->
-                        <div class="compact-grid" id="syllabus-content">
-                            <!-- Content will be loaded dynamically -->
-                        </div>
-                    </div>
 
-                    <!-- PYQs Tab -->
-                    <div id="pyqs-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold text-green-600">Previous Year Questions</h2>
-                            <div class="flex items-center">
-                                <span id="sec2-progress" class="text-xl font-bold text-green-600 mr-3">0%</span>
-                                <button class="btn-reset reset-section" data-section="sec2">Reset</button>
+                            <!-- PYQs Tab -->
+                            <div id="pyqs-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold text-green-600">Previous Year Questions</h2>
+                                    <div class="flex items-center">
+                                        <span id="sec2-progress" class="text-xl font-bold text-green-600 mr-3">0%</span>
+                                        <button class="btn-reset reset-section" data-section="sec2">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                                    <div id="bar-sec2" class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                                </div>
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="pyqs-content">
+                                    <!-- Content will be loaded dynamically -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
-                            <div id="bar-sec2" class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full progress-bar" style="width:0%"></div>
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="pyqs-content">
-                            <!-- Content will be loaded dynamically -->
-                        </div>
-                    </div>
 
-                    <!-- Test Series Tab -->
-                    <div id="tests-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold text-purple-600">Test Series</h2>
-                            <div class="flex items-center">
-                                <span id="sec3-progress" class="text-xl font-bold text-purple-600 mr-3">0%</span>
-                                <button class="btn-reset reset-section" data-section="sec3">Reset</button>
+                            <!-- Test Series Tab -->
+                            <div id="tests-tab" class="tab-content h-full overflow-y-auto compact-scroll pr-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold text-purple-600">Test Series</h2>
+                                    <div class="flex items-center">
+                                        <span id="sec3-progress" class="text-xl font-bold text-purple-600 mr-3">0%</span>
+                                        <button class="btn-reset reset-section" data-section="sec3">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                                    <div id="bar-sec3" class="bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full progress-bar" style="width:0%"></div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="tests-content">
+                                    <!-- Content will be loaded dynamically -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
-                            <div id="bar-sec3" class="bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full progress-bar" style="width:0%"></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="tests-content">
-                            <!-- Content will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -444,14 +584,12 @@
 
     <script>
         // ===== CONFIGURATION =====
-        // This section can be moved to a separate config.js file
         const CONFIG = {
-            GATE_DATE: '2025-02-01',
+            GATE_DATE: '2026-02-08',
             DEFAULT_DAILY_TARGET: 3
         };
 
         // ===== DATA MODELS =====
-        // This section can be moved to a separate data.js file
         const SYLLABUS_DATA = [
             {
                 title: "Network Analysis (4.8%)",
@@ -604,7 +742,6 @@
         ];
 
         // ===== UTILITY FUNCTIONS =====
-        // This section can be moved to a separate utils.js file
         const Utils = {
             showToast(message, isError = false) {
                 const toast = document.getElementById('toast');
@@ -634,11 +771,28 @@
                 const diffTime = gateDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return diffDays > 0 ? diffDays : 0;
+            },
+            
+            validateProgressData(data) {
+                if (!data || typeof data !== 'object') {
+                    return false;
+                }
+                
+                // Check for required properties
+                const requiredProps = ['totalProgress', 'syllabusProgress', 'pyqProgress', 
+                                      'testProgress', 'completedTopics', 'exportDate'];
+                
+                for (const prop of requiredProps) {
+                    if (!data.hasOwnProperty(prop)) {
+                        return false;
+                    }
+                }
+                
+                return true;
             }
         };
 
         // ===== CORE APPLICATION =====
-        // This section can be moved to a separate app.js file
         class GATETracker {
             constructor() {
                 this.checkboxIndex = 0;
@@ -659,8 +813,11 @@
                 // Dark Mode
                 document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
                 
-                // Export Button
+                // Import/Export Buttons
                 document.getElementById('export-progress').addEventListener('click', () => this.exportProgress());
+                document.getElementById('import-progress').addEventListener('click', () => this.openImportModal());
+                document.getElementById('closeImportModal').addEventListener('click', () => this.closeImportModal());
+                document.getElementById('confirmImport').addEventListener('click', () => this.importProgress());
                 
                 // Reset Buttons
                 document.getElementById('reset-all').addEventListener('click', () => this.resetAllProgress());
@@ -696,11 +853,18 @@
                     this.updateDailyProgress();
                 }, 500);
                 
+                // Fix: Use event delegation for dynamically created checkboxes
                 document.addEventListener('change', (e) => {
                     if (e.target.classList.contains('sec1-topic') || 
                         e.target.classList.contains('sec2-topic') || 
                         e.target.classList.contains('sec3-topic')) {
-                        this.updateProgress(e.target.closest('.tab-content').id.replace('-tab', ''));
+                        
+                        let section;
+                        if (e.target.classList.contains('sec1-topic')) section = 'sec1';
+                        else if (e.target.classList.contains('sec2-topic')) section = 'sec2';
+                        else if (e.target.classList.contains('sec3-topic')) section = 'sec3';
+                        
+                        this.updateProgress(section);
                         
                         // Check if this is a new completion today
                         if (e.target.checked && !e.target.dataset.completedToday) {
@@ -709,6 +873,13 @@
                         }
                         
                         debouncedSave();
+                    }
+                });
+                
+                // Close modal when clicking outside
+                document.getElementById('importModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'importModal') {
+                        this.closeImportModal();
                     }
                 });
             }
@@ -803,183 +974,322 @@
             }
 
             updateProgress(section) {
-                let total = 0;
-                const checkboxes = document.querySelectorAll(`.${section}-topic`);
-                
-                checkboxes.forEach(cb => {
-                    if (cb.checked) total += parseFloat(cb.dataset.weight);
-                });
-                
-                // Update UI
-                const sectionNum = section.charAt(3);
-                document.getElementById(`sec${sectionNum}-progress`).textContent = total.toFixed(1) + '%';
-                document.getElementById(`bar-sec${sectionNum}`).style.width = total + '%';
-                document.getElementById(`sec${sectionNum}-summary`).textContent = total.toFixed(1) + '%';
-                
-                this.updateTotal();
-                this.updateTopicCounts();
+                try {
+                    let total = 0;
+                    const checkboxes = document.querySelectorAll(`.${section}-topic`);
+                    
+                    checkboxes.forEach(cb => {
+                        if (cb.checked) total += parseFloat(cb.dataset.weight);
+                    });
+                    
+                    // Update UI
+                    const sectionNum = section.charAt(3);
+                    document.getElementById(`sec${sectionNum}-progress`).textContent = total.toFixed(1) + '%';
+                    document.getElementById(`bar-sec${sectionNum}`).style.width = total + '%';
+                    document.getElementById(`sec${sectionNum}-summary`).textContent = total.toFixed(1) + '%';
+                    
+                    this.updateTotal();
+                    this.updateTopicCounts();
+                } catch (error) {
+                    console.error('Error updating progress:', error);
+                }
             }
 
             updateTotal() {
-                const sec1 = parseFloat(document.getElementById('sec1-progress').textContent) || 0;
-                const sec2 = parseFloat(document.getElementById('sec2-progress').textContent) || 0;
-                const sec3 = parseFloat(document.getElementById('sec3-progress').textContent) || 0;
-                const total = sec1 + sec2 + sec3;
-                
-                document.getElementById('total-progress').textContent = total.toFixed(1) + '%';
-                document.getElementById('total-percentage').textContent = total.toFixed(1) + '%';
-                document.getElementById('bar-total').style.width = total + '%';
+                try {
+                    const sec1 = parseFloat(document.getElementById('sec1-progress').textContent) || 0;
+                    const sec2 = parseFloat(document.getElementById('sec2-progress').textContent) || 0;
+                    const sec3 = parseFloat(document.getElementById('sec3-progress').textContent) || 0;
+                    const total = sec1 + sec2 + sec3;
+                    
+                    // Fix: Update the correct element IDs
+                    document.getElementById('total-percentage').textContent = total.toFixed(1) + '%';
+                    document.getElementById('bar-total').style.width = total + '%';
+                } catch (error) {
+                    console.error('Error updating total progress:', error);
+                }
             }
 
             updateTopicCounts() {
-                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                let completed = 0;
-                
-                allCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) completed++;
-                });
-                
-                document.getElementById('completed-topics').textContent = completed;
-                document.getElementById('remaining-topics').textContent = allCheckboxes.length - completed;
+                try {
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    let completed = 0;
+                    
+                    allCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) completed++;
+                    });
+                    
+                    const totalCheckboxes = allCheckboxes.length;
+                    
+                    document.getElementById('completed-topics').textContent = completed;
+                    document.getElementById('remaining-topics').textContent = totalCheckboxes - completed;
+                } catch (error) {
+                    console.error('Error updating topic counts:', error);
+                }
             }
 
             updateDisplay() {
-                ['sec1', 'sec2', 'sec3'].forEach(section => this.updateProgress(section));
+                try {
+                    ['sec1', 'sec2', 'sec3'].forEach(section => this.updateProgress(section));
+                } catch (error) {
+                    console.error('Error updating display:', error);
+                }
             }
             
             updateDailyProgress() {
-                document.getElementById('today-progress').textContent = `${this.dailyCompleted}/${this.dailyTarget}`;
-                const progressPercent = (this.dailyCompleted / this.dailyTarget) * 100;
-                document.getElementById('today-progress-bar').style.width = `${Math.min(progressPercent, 100)}%`;
-                
-                // Update progress bar color based on completion
-                const progressBar = document.getElementById('today-progress-bar');
-                if (progressPercent >= 100) {
-                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
-                    progressBar.classList.add('bg-green-500');
-                } else if (progressPercent >= 50) {
-                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
-                    progressBar.classList.add('bg-yellow-500');
-                } else {
-                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500');
-                    progressBar.classList.add('bg-green-500');
+                try {
+                    document.getElementById('today-progress').textContent = `${this.dailyCompleted}/${this.dailyTarget}`;
+                    const progressPercent = (this.dailyCompleted / this.dailyTarget) * 100;
+                    document.getElementById('today-progress-bar').style.width = `${Math.min(progressPercent, 100)}%`;
+                    
+                    // Update progress bar color based on completion
+                    const progressBar = document.getElementById('today-progress-bar');
+                    if (progressPercent >= 100) {
+                        progressBar.classList.remove('bg-yellow-500');
+                        progressBar.classList.add('bg-green-500');
+                    } else if (progressPercent >= 50) {
+                        progressBar.classList.remove('bg-green-500');
+                        progressBar.classList.add('bg-yellow-500');
+                    } else {
+                        progressBar.classList.remove('bg-yellow-500');
+                        progressBar.classList.add('bg-green-500');
+                    }
+                } catch (error) {
+                    console.error('Error updating daily progress:', error);
                 }
             }
 
             exportProgress() {
-                const progressData = {
-                    totalProgress: document.getElementById('total-progress').textContent,
-                    syllabusProgress: document.getElementById('sec1-progress').textContent,
-                    pyqProgress: document.getElementById('sec2-progress').textContent,
-                    testProgress: document.getElementById('sec3-progress').textContent,
-                    completedTopics: document.getElementById('completed-topics').textContent,
-                    exportDate: new Date().toISOString()
-                };
-                
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData, null, 2));
-                const downloadAnchorNode = document.createElement('a');
-                downloadAnchorNode.setAttribute("href", dataStr);
-                downloadAnchorNode.setAttribute("download", `gate_ece_progress_${new Date().toISOString().split('T')[0]}.json`);
-                document.body.appendChild(downloadAnchorNode);
-                downloadAnchorNode.click();
-                downloadAnchorNode.remove();
-                
-                Utils.showToast('Progress exported successfully!');
+                try {
+                    const progressData = {
+                        totalProgress: document.getElementById('total-percentage').textContent,
+                        syllabusProgress: document.getElementById('sec1-progress').textContent,
+                        pyqProgress: document.getElementById('sec2-progress').textContent,
+                        testProgress: document.getElementById('sec3-progress').textContent,
+                        completedTopics: document.getElementById('completed-topics').textContent,
+                        dailyTarget: this.dailyTarget,
+                        dailyCompleted: this.dailyCompleted,
+                        exportDate: new Date().toISOString()
+                    };
+                    
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData, null, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", `gate_ece_progress_${new Date().toISOString().split('T')[0]}.json`);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                    
+                    Utils.showToast('Progress exported successfully!');
+                } catch (error) {
+                    console.error('Error exporting progress:', error);
+                    Utils.showToast('Error exporting progress data', true);
+                }
+            }
+            
+            openImportModal() {
+                document.getElementById('importModal').classList.add('active');
+            }
+            
+            closeImportModal() {
+                document.getElementById('importModal').classList.remove('active');
+                document.getElementById('importFile').value = '';
+            }
+            
+            importProgress() {
+                try {
+                    const fileInput = document.getElementById('importFile');
+                    const file = fileInput.files[0];
+                    
+                    if (!file) {
+                        Utils.showToast('Please select a file to import', true);
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        try {
+                            const progressData = JSON.parse(e.target.result);
+                            
+                            if (!Utils.validateProgressData(progressData)) {
+                                Utils.showToast('Invalid progress data file', true);
+                                return;
+                            }
+                            
+                            // Import daily progress data
+                            if (progressData.dailyTarget && progressData.dailyCompleted) {
+                                this.dailyTarget = progressData.dailyTarget;
+                                this.dailyCompleted = progressData.dailyCompleted;
+                                document.getElementById('daily-target-input').value = this.dailyTarget;
+                                this.updateDailyProgress();
+                            }
+                            
+                            // Update UI with imported data
+                            document.getElementById('total-percentage').textContent = progressData.totalProgress;
+                            document.getElementById('sec1-progress').textContent = progressData.syllabusProgress;
+                            document.getElementById('sec2-progress').textContent = progressData.pyqProgress;
+                            document.getElementById('sec3-progress').textContent = progressData.testProgress;
+                            document.getElementById('completed-topics').textContent = progressData.completedTopics;
+                            
+                            // Update progress bars
+                            const total = parseFloat(progressData.totalProgress) || 0;
+                            document.getElementById('bar-total').style.width = total + '%';
+                            
+                            const sec1 = parseFloat(progressData.syllabusProgress) || 0;
+                            document.getElementById('bar-sec1').style.width = sec1 + '%';
+                            
+                            const sec2 = parseFloat(progressData.pyqProgress) || 0;
+                            document.getElementById('bar-sec2').style.width = sec2 + '%';
+                            
+                            const sec3 = parseFloat(progressData.testProgress) || 0;
+                            document.getElementById('bar-sec3').style.width = sec3 + '%';
+                            
+                            // Save to localStorage
+                            this.saveUserProgress();
+                            
+                            this.closeImportModal();
+                            Utils.showToast('Progress data imported successfully!');
+                        } catch (error) {
+                            console.error('Error parsing imported file:', error);
+                            Utils.showToast('Error parsing imported file', true);
+                        }
+                    };
+                    
+                    reader.onerror = () => {
+                        Utils.showToast('Error reading file', true);
+                    };
+                    
+                    reader.readAsText(file);
+                } catch (error) {
+                    console.error('Error importing progress:', error);
+                    Utils.showToast('Error importing progress data', true);
+                }
             }
 
             resetSectionProgress(section) {
-                const checkboxes = document.querySelectorAll(`.${section}-topic`);
-                
-                if (checkboxes.length > 0 && confirm(`Reset all progress in ${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'}?`)) {
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    this.updateProgress(section);
-                    this.saveUserProgress();
-                    Utils.showToast(`${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'} progress reset`);
+                try {
+                    const checkboxes = document.querySelectorAll(`.${section}-topic`);
+                    
+                    if (checkboxes.length > 0 && confirm(`Reset all progress in ${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'}?`)) {
+                        checkboxes.forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        this.updateProgress(section);
+                        this.saveUserProgress();
+                        Utils.showToast(`${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'} progress reset`);
+                    }
+                } catch (error) {
+                    console.error('Error resetting section progress:', error);
                 }
             }
 
             resetAllProgress() {
-                if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
-                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                    allCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    ['sec1','sec2','sec3'].forEach(section => this.updateProgress(section));
-                    this.saveUserProgress();
-                    Utils.showToast('All progress reset successfully');
+                try {
+                    if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
+                        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                        allCheckboxes.forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        
+                        // FIX: Reset daily progress when resetting all
+                        this.dailyCompleted = 0;
+                        
+                        ['sec1','sec2','sec3'].forEach(section => this.updateProgress(section));
+                        this.updateDailyProgress();
+                        this.saveUserProgress();
+                        Utils.showToast('All progress reset successfully');
+                    }
+                } catch (error) {
+                    console.error('Error resetting all progress:', error);
                 }
             }
 
             switchTab(tabName) {
-                // Update tabs
-                document.querySelectorAll('.section-tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.tab === tabName);
-                });
-                
-                // Update content
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.toggle('active', content.id === `${tabName}-tab`);
-                });
+                try {
+                    // Update tabs
+                    document.querySelectorAll('.section-tab').forEach(tab => {
+                        tab.classList.toggle('active', tab.dataset.tab === tabName);
+                    });
+                    
+                    // Update content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.toggle('active', content.id === `${tabName}-tab`);
+                    });
+                } catch (error) {
+                    console.error('Error switching tabs:', error);
+                }
             }
 
             saveUserProgress() {
-                const progressData = {};
-                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                
-                allCheckboxes.forEach((checkbox, index) => {
-                    progressData[`checkbox_${index}`] = checkbox.checked;
-                });
-                
-                // Save daily progress
-                const dailyData = {
-                    target: this.dailyTarget,
-                    completed: this.dailyCompleted,
-                    lastUpdated: new Date().toDateString()
-                };
-                
-                localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
-                localStorage.setItem('gate_ece_daily', JSON.stringify(dailyData));
-            }
-
-            loadUserProgress() {
-                const savedProgress = localStorage.getItem('gate_ece_progress');
-                
-                if (savedProgress) {
-                    const progressData = JSON.parse(savedProgress);
+                try {
+                    const progressData = {};
                     const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
                     
                     allCheckboxes.forEach((checkbox, index) => {
-                        if (progressData[`checkbox_${index}`] !== undefined) {
-                            checkbox.checked = progressData[`checkbox_${index}`];
-                        }
+                        progressData[`checkbox_${index}`] = checkbox.checked;
                     });
                     
-                    this.updateDisplay();
-                }
-                
-                // Load daily progress
-                const savedDaily = localStorage.getItem('gate_ece_daily');
-                if (savedDaily) {
-                    const dailyData = JSON.parse(savedDaily);
-                    this.dailyTarget = dailyData.target || CONFIG.DEFAULT_DAILY_TARGET;
-                    this.dailyCompleted = dailyData.completed || 0;
+                    // Save daily progress
+                    const dailyData = {
+                        target: this.dailyTarget,
+                        completed: this.dailyCompleted,
+                        lastUpdated: new Date().toDateString()
+                    };
                     
-                    // Check if it's a new day
-                    const today = new Date().toDateString();
-                    if (dailyData.lastUpdated !== today) {
-                        this.dailyCompleted = 0;
+                    localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
+                    localStorage.setItem('gate_ece_daily', JSON.stringify(dailyData));
+                } catch (error) {
+                    console.error('Error saving user progress:', error);
+                }
+            }
+
+            loadUserProgress() {
+                try {
+                    const savedProgress = localStorage.getItem('gate_ece_progress');
+                    
+                    if (savedProgress) {
+                        const progressData = JSON.parse(savedProgress);
+                        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                        
+                        allCheckboxes.forEach((checkbox, index) => {
+                            if (progressData[`checkbox_${index}`] !== undefined) {
+                                checkbox.checked = progressData[`checkbox_${index}`];
+                            }
+                        });
+                        
+                        this.updateDisplay();
                     }
                     
-                    document.getElementById('daily-target-input').value = this.dailyTarget;
+                    // Load daily progress
+                    const savedDaily = localStorage.getItem('gate_ece_daily');
+                    if (savedDaily) {
+                        const dailyData = JSON.parse(savedDaily);
+                        this.dailyTarget = dailyData.target || CONFIG.DEFAULT_DAILY_TARGET;
+                        this.dailyCompleted = dailyData.completed || 0;
+                        
+                        // Check if it's a new day
+                        const today = new Date().toDateString();
+                        if (dailyData.lastUpdated !== today) {
+                            this.dailyCompleted = 0;
+                        }
+                        
+                        document.getElementById('daily-target-input').value = this.dailyTarget;
+                    }
+                } catch (error) {
+                    console.error('Error loading user progress:', error);
                 }
             }
         }
 
         // ===== INITIALIZE APPLICATION =====
         document.addEventListener('DOMContentLoaded', () => {
-            new GATETracker();
+            try {
+                new GATETracker();
+            } catch (error) {
+                console.error('Error initializing application:', error);
+                Utils.showToast('Error initializing application', true);
+            }
         });
     </script>
 </body>

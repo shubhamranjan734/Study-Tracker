@@ -6,7 +6,8 @@
     <title>GATE ECE Preparation Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" sizes="512x512" href="Screenshot 2025-10-04 105846.png">
+    <!-- Fixed favicon using data URI -->
+    <link rel="icon" type="image/png" sizes="512x512" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <style>
         /* All the CSS styles remain exactly the same as before */
         :root {
@@ -61,7 +62,7 @@
             margin-bottom: 0.5rem;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow:  0 2px 8px rgba(0,0,0,0.05);
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
         }
@@ -241,6 +242,7 @@
         
         .gradient-text {
             background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -318,7 +320,7 @@
         
         .modal-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
@@ -388,6 +390,23 @@
             overflow: hidden;
         }
         
+        /* Accessibility: Skip link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: white;
+            padding: 8px;
+            z-index: 10000;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
         /* RESPONSIVE IMPROVEMENTS */
         
         /* Mobile-first adjustments */
@@ -431,6 +450,7 @@
                 text-align: center;
                 padding: 0.75rem 0.5rem;
                 font-size: 0.8rem;
+                min-height: 44px; /* Touch target size */
             }
             
             /* Content cards padding */
@@ -474,6 +494,7 @@
             .btn-reset {
                 padding: 0.6rem 1rem;
                 font-size: 0.9rem;
+                min-height: 44px; /* Touch target size */
             }
             
             /* Tab content adjustments */
@@ -484,6 +505,13 @@
             /* Footer text size */
             footer {
                 font-size: 0.8rem;
+            }
+            
+            /* Modal adjustments for mobile */
+            .modal-content {
+                margin: 0.5rem;
+                padding: 1rem;
+                width: calc(100% - 1rem);
             }
         }
         
@@ -605,6 +633,9 @@
     </style>
 </head>
 <body class="p-4">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
@@ -613,7 +644,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="text-xl font-bold">Import Progress Data</h2>
-                <button class="modal-close" id="closeImportModal">&times;</button>
+                <button class="modal-close" id="closeImportModal" aria-label="Close import modal">&times;</button>
             </div>
             <p class="mb-4 text-gray-600 dark:text-gray-400">
                 Select a previously exported JSON file to import your progress data.
@@ -625,12 +656,12 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto" id="main-content">
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center">
                 <div class="section-icon">
-                    <i class="fas fa-graduation-cap"></i>
+                    <i class="fas fa-graduation-cap" aria-hidden="true"></i>
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold gradient-text">GATE ECE Preparation Tracker</h1>
@@ -639,18 +670,18 @@
             </div>
             <div class="flex items-center space-x-4">
                 <!-- Dark Mode Toggle -->
-                <button id="darkModeToggle" class="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                    <i class="fas fa-moon text-gray-700 dark:text-yellow-400"></i>
+                <button id="darkModeToggle" class="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon text-gray-700 dark:text-yellow-400" aria-hidden="true"></i>
                 </button>
                 
                 <!-- Import/Export Buttons -->
                 <div class="import-export-buttons">
-                    <button id="import-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
-                        <i class="fas fa-upload text-blue-600 dark:text-blue-400"></i>
+                    <button id="import-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition" aria-label="Import progress data">
+                        <i class="fas fa-upload text-blue-600 dark:text-blue-400" aria-hidden="true"></i>
                         <span class="font-medium hidden sm:inline">Import</span>
                     </button>
-                    <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
-                        <i class="fas fa-download text-blue-600 dark:text-blue-400"></i>
+                    <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition" aria-label="Export progress data">
+                        <i class="fas fa-download text-blue-600 dark:text-blue-400" aria-hidden="true"></i>
                         <span class="font-medium hidden sm:inline">Export</span>
                     </button>
                 </div>
@@ -658,7 +689,7 @@
         </header>
 
         <!-- Main Dashboard -->
-        <div class="dashboard-grid">
+        <main class="dashboard-grid">
             <!-- Left Column - Progress & Controls -->
             <div class="left-column">
                 <!-- Stats Overview -->
@@ -702,7 +733,7 @@
                     <h3 class="text-lg font-semibold mb-3">Daily Study Target</h3>
                     <div class="daily-target">
                         <span>Topics to complete today:</span>
-                        <input type="number" id="daily-target-input" class="target-input" value="3" min="1" max="10">
+                        <input type="number" id="daily-target-input" class="target-input" value="3" min="1" max="50">
                     </div>
                     <div class="flex items-center justify-between">
                         <span>Today's progress:</span>
@@ -721,14 +752,14 @@
                     <div class="tab-container">
                         <!-- Tabs Navigation -->
                         <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
-                            <button class="section-tab flex-1 text-center active" data-tab="syllabus">
-                                <i class="fas fa-book mr-2"></i>Syllabus
+                            <button class="section-tab flex-1 text-center active" data-tab="syllabus" aria-label="Syllabus tab">
+                                <i class="fas fa-book mr-2" aria-hidden="true"></i>Syllabus
                             </button>
-                            <button class="section-tab flex-1 text-center" data-tab="pyqs">
-                                <i class="fas fa-history mr-2"></i>PYQs
+                            <button class="section-tab flex-1 text-center" data-tab="pyqs" aria-label="Previous Year Questions tab">
+                                <i class="fas fa-history mr-2" aria-hidden="true"></i>PYQs
                             </button>
-                            <button class="section-tab flex-1 text-center" data-tab="tests">
-                                <i class="fas fa-clipboard-list mr-2"></i>Test Series
+                            <button class="section-tab flex-1 text-center" data-tab="tests" aria-label="Test Series tab">
+                                <i class="fas fa-clipboard-list mr-2" aria-hidden="true"></i>Test Series
                             </button>
                         </div>
 
@@ -790,7 +821,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
 
         <!-- Footer -->
         <footer class="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
@@ -996,8 +1027,7 @@
                 }
                 
                 // Check for required properties
-                const requiredProps = ['totalProgress', 'syllabusProgress', 'pyqProgress', 
-                                      'testProgress', 'completedTopics', 'exportDate'];
+                const requiredProps = ['checkboxes', 'dailyTarget', 'dailyCompleted'];
                 
                 for (const prop of requiredProps) {
                     if (!data.hasOwnProperty(prop)) {
@@ -1015,7 +1045,8 @@
                 this.checkboxIndex = 0;
                 this.dailyCompleted = 0;
                 this.dailyTarget = CONFIG.DEFAULT_DAILY_TARGET;
-                this.isLoading = true; // Add loading flag
+                this.isLoading = true;
+                this._boundHandlers = new Map();
                 this.init();
             }
 
@@ -1023,89 +1054,157 @@
                 this.setupEventListeners();
                 this.loadUserState();
                 this.renderContent();
-                // Update display will be called after content is rendered and data is loaded
             }
 
             setupEventListeners() {
                 // Dark Mode
-                document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
+                this.addEventListener(
+                    document.getElementById('darkModeToggle'),
+                    'click',
+                    () => this.toggleDarkMode()
+                );
                 
                 // Import/Export Buttons
-                document.getElementById('export-progress').addEventListener('click', () => this.exportProgress());
-                document.getElementById('import-progress').addEventListener('click', () => this.openImportModal());
-                document.getElementById('closeImportModal').addEventListener('click', () => this.closeImportModal());
-                document.getElementById('confirmImport').addEventListener('click', () => this.importProgress());
+                this.addEventListener(
+                    document.getElementById('export-progress'),
+                    'click',
+                    () => this.exportProgress()
+                );
+                this.addEventListener(
+                    document.getElementById('import-progress'),
+                    'click',
+                    () => this.openImportModal()
+                );
+                this.addEventListener(
+                    document.getElementById('closeImportModal'),
+                    'click',
+                    () => this.closeImportModal()
+                );
+                this.addEventListener(
+                    document.getElementById('confirmImport'),
+                    'click',
+                    () => this.importProgress()
+                );
                 
                 // Reset Buttons
-                document.getElementById('reset-all').addEventListener('click', () => this.resetAllProgress());
-                document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('reset-section')) {
-                        this.resetSectionProgress(e.target.dataset.section);
+                this.addEventListener(
+                    document.getElementById('reset-all'),
+                    'click',
+                    () => this.resetAllProgress()
+                );
+                
+                // Use event delegation for reset section buttons
+                this.addEventListener(
+                    document,
+                    'click',
+                    (e) => {
+                        if (e.target.classList.contains('reset-section')) {
+                            this.resetSectionProgress(e.target.dataset.section);
+                        }
                     }
-                });
+                );
 
                 // Tabs
                 document.querySelectorAll('.section-tab').forEach(tab => {
-                    tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                    this.addEventListener(
+                        tab,
+                        'click',
+                        () => this.switchTab(tab.dataset.tab)
+                    );
                 });
                 
-                // Daily Target
-                document.getElementById('daily-target-input').addEventListener('change', (e) => {
-                    this.dailyTarget = parseInt(e.target.value) || CONFIG.DEFAULT_DAILY_TARGET;
-                    this.updateDailyProgress();
-                    this.saveUserProgress();
-                });
+                // Daily Target with input validation
+                this.addEventListener(
+                    document.getElementById('daily-target-input'),
+                    'change',
+                    (e) => {
+                        let value = parseInt(e.target.value);
+                        
+                        // Validate and sanitize input
+                        if (isNaN(value) || value < 1) {
+                            value = CONFIG.DEFAULT_DAILY_TARGET;
+                            Utils.showToast('Daily target must be at least 1', true);
+                        } else if (value > 50) {
+                            value = 50;
+                            Utils.showToast('Daily target capped at 50', true);
+                        }
+                        
+                        e.target.value = value;
+                        this.dailyTarget = value;
+                        this.updateDailyProgress();
+                        this.saveUserProgress();
+                    }
+                );
                 
                 // Reset Daily Progress
-                document.getElementById('reset-daily-progress').addEventListener('click', () => {
-                    this.dailyCompleted = 0;
-                    this.updateDailyProgress();
-                    this.saveUserProgress();
-                    Utils.showToast('Daily progress reset');
-                });
+                this.addEventListener(
+                    document.getElementById('reset-daily-progress'),
+                    'click',
+                    () => {
+                        this.dailyCompleted = 0;
+                        this.updateDailyProgress();
+                        this.saveUserProgress();
+                        Utils.showToast('Daily progress reset');
+                    }
+                );
 
                 // Debounced save for checkbox changes
                 const debouncedSave = Utils.debounce(() => {
-                    if (!this.isLoading) { // Don't save during initial loading
+                    if (!this.isLoading) {
                         this.saveUserProgress();
                         this.updateDailyProgress();
                     }
                 }, 500);
                 
-                // Fix: Use event delegation for dynamically created checkboxes
-                document.addEventListener('change', (e) => {
-                    if (e.target.classList.contains('sec1-topic') || 
-                        e.target.classList.contains('sec2-topic') || 
-                        e.target.classList.contains('sec3-topic')) {
-                        
-                        let section;
-                        if (e.target.classList.contains('sec1-topic')) section = 'sec1';
-                        else if (e.target.classList.contains('sec2-topic')) section = 'sec2';
-                        else if (e.target.classList.contains('sec3-topic')) section = 'sec3';
-                        
-                        this.updateProgress(section);
-                        
-                        // FIX: Handle both checking and unchecking for daily progress
-                        if (e.target.checked && !e.target.dataset.completedToday) {
-                            // New completion today
-                            this.dailyCompleted++;
-                            e.target.dataset.completedToday = 'true';
-                        } else if (!e.target.checked && e.target.dataset.completedToday) {
-                            // Topic was unchecked that was completed today
-                            this.dailyCompleted = Math.max(0, this.dailyCompleted - 1);
-                            delete e.target.dataset.completedToday;
+                // Use event delegation for dynamically created checkboxes
+                this.addEventListener(
+                    document,
+                    'change',
+                    (e) => {
+                        if (e.target.classList.contains('sec1-topic') || 
+                            e.target.classList.contains('sec2-topic') || 
+                            e.target.classList.contains('sec3-topic')) {
+                            
+                            let section;
+                            if (e.target.classList.contains('sec1-topic')) section = 'sec1';
+                            else if (e.target.classList.contains('sec2-topic')) section = 'sec2';
+                            else if (e.target.classList.contains('sec3-topic')) section = 'sec3';
+                            
+                            this.updateProgress(section);
+                            
+                            // Handle both checking and unchecking for daily progress
+                            if (e.target.checked && !e.target.dataset.completedToday) {
+                                // New completion today
+                                this.dailyCompleted++;
+                                e.target.dataset.completedToday = 'true';
+                            } else if (!e.target.checked && e.target.dataset.completedToday) {
+                                // Topic was unchecked that was completed today
+                                this.dailyCompleted = Math.max(0, this.dailyCompleted - 1);
+                                delete e.target.dataset.completedToday;
+                            }
+                            
+                            debouncedSave();
                         }
-                        
-                        debouncedSave();
                     }
-                });
+                );
                 
                 // Close modal when clicking outside
-                document.getElementById('importModal').addEventListener('click', (e) => {
-                    if (e.target.id === 'importModal') {
-                        this.closeImportModal();
+                this.addEventListener(
+                    document.getElementById('importModal'),
+                    'click',
+                    (e) => {
+                        if (e.target.id === 'importModal') {
+                            this.closeImportModal();
+                        }
                     }
-                });
+                );
+            }
+
+            // Helper method to add event listeners with proper binding
+            addEventListener(element, event, handler) {
+                const boundHandler = handler.bind(this);
+                this._boundHandlers.set(handler, boundHandler);
+                element.addEventListener(event, boundHandler);
             }
 
             toggleDarkMode() {
@@ -1206,11 +1305,17 @@
                         if (cb.checked) total += parseFloat(cb.dataset.weight);
                     });
                     
-                    // Update UI
+                    // Update UI with null checks
                     const sectionNum = section.charAt(3);
-                    document.getElementById(`sec${sectionNum}-progress`).textContent = total.toFixed(1) + '%';
-                    document.getElementById(`bar-sec${sectionNum}`).style.width = total + '%';
-                    document.getElementById(`sec${sectionNum}-summary`).textContent = total.toFixed(1) + '%';
+                    const progressElement = document.getElementById(`sec${sectionNum}-progress`);
+                    const barElement = document.getElementById(`bar-sec${sectionNum}`);
+                    const summaryElement = document.getElementById(`sec${sectionNum}-summary`);
+                    
+                    if (progressElement && barElement && summaryElement) {
+                        progressElement.textContent = total.toFixed(1) + '%';
+                        barElement.style.width = total + '%';
+                        summaryElement.textContent = total.toFixed(1) + '%';
+                    }
                     
                     this.updateTotal();
                     this.updateTopicCounts();
@@ -1221,14 +1326,18 @@
 
             updateTotal() {
                 try {
-                    const sec1 = parseFloat(document.getElementById('sec1-progress').textContent) || 0;
-                    const sec2 = parseFloat(document.getElementById('sec2-progress').textContent) || 0;
-                    const sec3 = parseFloat(document.getElementById('sec3-progress').textContent) || 0;
+                    const sec1 = parseFloat(document.getElementById('sec1-progress')?.textContent) || 0;
+                    const sec2 = parseFloat(document.getElementById('sec2-progress')?.textContent) || 0;
+                    const sec3 = parseFloat(document.getElementById('sec3-progress')?.textContent) || 0;
                     const total = sec1 + sec2 + sec3;
                     
-                    // Fix: Update the correct element IDs
-                    document.getElementById('total-percentage').textContent = total.toFixed(1) + '%';
-                    document.getElementById('bar-total').style.width = total + '%';
+                    const totalElement = document.getElementById('total-percentage');
+                    const barTotal = document.getElementById('bar-total');
+                    
+                    if (totalElement && barTotal) {
+                        totalElement.textContent = total.toFixed(1) + '%';
+                        barTotal.style.width = total + '%';
+                    }
                 } catch (error) {
                     console.error('Error updating total progress:', error);
                 }
@@ -1244,9 +1353,13 @@
                     });
                     
                     const totalCheckboxes = allCheckboxes.length;
+                    const completedElement = document.getElementById('completed-topics');
+                    const remainingElement = document.getElementById('remaining-topics');
                     
-                    document.getElementById('completed-topics').textContent = completed;
-                    document.getElementById('remaining-topics').textContent = totalCheckboxes - completed;
+                    if (completedElement && remainingElement) {
+                        completedElement.textContent = completed;
+                        remainingElement.textContent = totalCheckboxes - completed;
+                    }
                 } catch (error) {
                     console.error('Error updating topic counts:', error);
                 }
@@ -1262,21 +1375,25 @@
             
             updateDailyProgress() {
                 try {
-                    document.getElementById('today-progress').textContent = `${this.dailyCompleted}/${this.dailyTarget}`;
-                    const progressPercent = (this.dailyCompleted / this.dailyTarget) * 100;
-                    document.getElementById('today-progress-bar').style.width = `${Math.min(progressPercent, 100)}%`;
+                    const todayProgress = document.getElementById('today-progress');
+                    const todayProgressBar = document.getElementById('today-progress-bar');
                     
-                    // Update progress bar color based on completion
-                    const progressBar = document.getElementById('today-progress-bar');
-                    if (progressPercent >= 100) {
-                        progressBar.classList.remove('bg-yellow-500');
-                        progressBar.classList.add('bg-green-500');
-                    } else if (progressPercent >= 50) {
-                        progressBar.classList.remove('bg-green-500');
-                        progressBar.classList.add('bg-yellow-500');
-                    } else {
-                        progressBar.classList.remove('bg-yellow-500');
-                        progressBar.classList.add('bg-green-500');
+                    if (todayProgress && todayProgressBar) {
+                        todayProgress.textContent = `${this.dailyCompleted}/${this.dailyTarget}`;
+                        const progressPercent = (this.dailyCompleted / this.dailyTarget) * 100;
+                        todayProgressBar.style.width = `${Math.min(progressPercent, 100)}%`;
+                        
+                        // Update progress bar color based on completion
+                        if (progressPercent >= 100) {
+                            todayProgressBar.classList.remove('bg-yellow-500');
+                            todayProgressBar.classList.add('bg-green-500');
+                        } else if (progressPercent >= 50) {
+                            todayProgressBar.classList.remove('bg-green-500');
+                            todayProgressBar.classList.add('bg-yellow-500');
+                        } else {
+                            todayProgressBar.classList.remove('bg-yellow-500');
+                            todayProgressBar.classList.add('bg-green-500');
+                        }
                     }
                 } catch (error) {
                     console.error('Error updating daily progress:', error);
@@ -1285,16 +1402,43 @@
 
             exportProgress() {
                 try {
+                    const exportBtn = document.getElementById('export-progress');
+                    const originalHTML = exportBtn.innerHTML;
+                    
+                    // Show loading state
+                    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="ml-2 hidden sm:inline">Exporting...</span>';
+                    exportBtn.disabled = true;
+                    
+                    // Create a comprehensive progress data object with checkbox states
                     const progressData = {
-                        totalProgress: document.getElementById('total-percentage').textContent,
-                        syllabusProgress: document.getElementById('sec1-progress').textContent,
-                        pyqProgress: document.getElementById('sec2-progress').textContent,
-                        testProgress: document.getElementById('sec3-progress').textContent,
-                        completedTopics: document.getElementById('completed-topics').textContent,
+                        // Save individual checkbox states with unique identifiers
+                        checkboxes: {},
+                        // Save daily progress
                         dailyTarget: this.dailyTarget,
                         dailyCompleted: this.dailyCompleted,
-                        exportDate: new Date().toISOString()
+                        // Save overall progress for backward compatibility
+                        totalProgress: document.getElementById('total-percentage')?.textContent || '0%',
+                        syllabusProgress: document.getElementById('sec1-progress')?.textContent || '0%',
+                        pyqProgress: document.getElementById('sec2-progress')?.textContent || '0%',
+                        testProgress: document.getElementById('sec3-progress')?.textContent || '0%',
+                        completedTopics: document.getElementById('completed-topics')?.textContent || '0',
+                        // Save timestamp
+                        exportDate: new Date().toISOString(),
+                        // Version identifier for future compatibility
+                        version: '2.0'
                     };
+                    
+                    // Save each checkbox state with a unique identifier
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    allCheckboxes.forEach((checkbox) => {
+                        const topicId = checkbox.dataset.topicId;
+                        if (topicId) {
+                            progressData.checkboxes[topicId] = {
+                                checked: checkbox.checked,
+                                completedToday: checkbox.dataset.completedToday || false
+                            };
+                        }
+                    });
                     
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData, null, 2));
                     const downloadAnchorNode = document.createElement('a');
@@ -1304,9 +1448,19 @@
                     downloadAnchorNode.click();
                     downloadAnchorNode.remove();
                     
+                    // Reset button after a short delay
+                    setTimeout(() => {
+                        exportBtn.innerHTML = originalHTML;
+                        exportBtn.disabled = false;
+                    }, 1000);
+                    
                     Utils.showToast('Progress exported successfully!');
                 } catch (error) {
                     console.error('Error exporting progress:', error);
+                    // Reset button on error
+                    const exportBtn = document.getElementById('export-progress');
+                    exportBtn.innerHTML = '<i class="fas fa-download"></i><span class="ml-2 hidden sm:inline">Export</span>';
+                    exportBtn.disabled = false;
                     Utils.showToast('Error exporting progress data', true);
                 }
             }
@@ -1330,58 +1484,76 @@
                         return;
                     }
                     
+                    // File type validation
+                    if (!file.name.endsWith('.json')) {
+                        Utils.showToast('Please select a JSON file', true);
+                        return;
+                    }
+                    
+                    // File size validation (max 1MB)
+                    if (file.size > 1024 * 1024) {
+                        Utils.showToast('File too large (max 1MB)', true);
+                        return;
+                    }
+                    
+                    const importBtn = document.getElementById('confirmImport');
+                    const originalHTML = importBtn.innerHTML;
+                    
+                    // Show loading state
+                    importBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+                    importBtn.disabled = true;
+                    
                     const reader = new FileReader();
                     
                     reader.onload = (e) => {
                         try {
                             const progressData = JSON.parse(e.target.result);
                             
-                            if (!Utils.validateProgressData(progressData)) {
-                                Utils.showToast('Invalid progress data file', true);
-                                return;
-                            }
-                            
-                            // Import daily progress data
-                            if (progressData.dailyTarget && progressData.dailyCompleted) {
-                                this.dailyTarget = progressData.dailyTarget;
-                                this.dailyCompleted = progressData.dailyCompleted;
-                                document.getElementById('daily-target-input').value = this.dailyTarget;
+                            // Check if this is the new format with checkbox states
+                            if (progressData.checkboxes) {
+                                // New format: Restore individual checkbox states
+                                this.restoreCheckboxStates(progressData.checkboxes);
+                                
+                                // Import daily progress data if available
+                                if (progressData.dailyTarget !== undefined) {
+                                    this.dailyTarget = progressData.dailyTarget;
+                                    this.dailyCompleted = progressData.dailyCompleted || 0;
+                                    document.getElementById('daily-target-input').value = this.dailyTarget;
+                                }
+                                
+                                // Update display after restoring all checkboxes
+                                this.updateDisplay();
                                 this.updateDailyProgress();
+                                
+                                // Save to localStorage
+                                this.saveUserProgress();
+                                
+                                this.closeImportModal();
+                                Utils.showToast('Progress data imported successfully!');
+                            } 
+                            // Handle old format for backward compatibility
+                            else if (progressData.totalProgress && progressData.syllabusProgress && progressData.pyqProgress && progressData.testProgress) {
+                                // Old format - fallback behavior
+                                this.handleLegacyImport(progressData);
+                            } 
+                            else {
+                                Utils.showToast('Invalid progress data file format', true);
                             }
-                            
-                            // Update UI with imported data
-                            document.getElementById('total-percentage').textContent = progressData.totalProgress;
-                            document.getElementById('sec1-progress').textContent = progressData.syllabusProgress;
-                            document.getElementById('sec2-progress').textContent = progressData.pyqProgress;
-                            document.getElementById('sec3-progress').textContent = progressData.testProgress;
-                            document.getElementById('completed-topics').textContent = progressData.completedTopics;
-                            
-                            // Update progress bars
-                            const total = parseFloat(progressData.totalProgress) || 0;
-                            document.getElementById('bar-total').style.width = total + '%';
-                            
-                            const sec1 = parseFloat(progressData.syllabusProgress) || 0;
-                            document.getElementById('bar-sec1').style.width = sec1 + '%';
-                            
-                            const sec2 = parseFloat(progressData.pyqProgress) || 0;
-                            document.getElementById('bar-sec2').style.width = sec2 + '%';
-                            
-                            const sec3 = parseFloat(progressData.testProgress) || 0;
-                            document.getElementById('bar-sec3').style.width = sec3 + '%';
-                            
-                            // Save to localStorage
-                            this.saveUserProgress();
-                            
-                            this.closeImportModal();
-                            Utils.showToast('Progress data imported successfully!');
                         } catch (error) {
                             console.error('Error parsing imported file:', error);
-                            Utils.showToast('Error parsing imported file', true);
+                            Utils.showToast('Error parsing imported file: ' + error.message, true);
+                        } finally {
+                            // Reset button
+                            importBtn.innerHTML = originalHTML;
+                            importBtn.disabled = false;
                         }
                     };
                     
                     reader.onerror = () => {
                         Utils.showToast('Error reading file', true);
+                        // Reset button
+                        importBtn.innerHTML = originalHTML;
+                        importBtn.disabled = false;
                     };
                     
                     reader.readAsText(file);
@@ -1391,13 +1563,79 @@
                 }
             }
 
+            // New method to restore checkbox states from imported data
+            restoreCheckboxStates(checkboxStates) {
+                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                
+                allCheckboxes.forEach(checkbox => {
+                    const topicId = checkbox.dataset.topicId;
+                    if (topicId && checkboxStates[topicId]) {
+                        checkbox.checked = checkboxStates[topicId].checked;
+                        
+                        // Restore completedToday flag if it exists
+                        if (checkboxStates[topicId].completedToday) {
+                            checkbox.dataset.completedToday = 'true';
+                        } else {
+                            delete checkbox.dataset.completedToday;
+                        }
+                    }
+                });
+            }
+
+            // Handle legacy import format for backward compatibility
+            handleLegacyImport(progressData) {
+                // For legacy format, we'll set the overall progress but can't restore individual checkboxes
+                const totalElement = document.getElementById('total-percentage');
+                const sec1Element = document.getElementById('sec1-progress');
+                const sec2Element = document.getElementById('sec2-progress');
+                const sec3Element = document.getElementById('sec3-progress');
+                const completedElement = document.getElementById('completed-topics');
+                
+                if (totalElement) totalElement.textContent = progressData.totalProgress;
+                if (sec1Element) sec1Element.textContent = progressData.syllabusProgress;
+                if (sec2Element) sec2Element.textContent = progressData.pyqProgress;
+                if (sec3Element) sec3Element.textContent = progressData.testProgress;
+                if (completedElement) completedElement.textContent = progressData.completedTopics;
+                
+                // Update progress bars
+                const total = parseFloat(progressData.totalProgress) || 0;
+                const barTotal = document.getElementById('bar-total');
+                if (barTotal) barTotal.style.width = total + '%';
+                
+                const sec1 = parseFloat(progressData.syllabusProgress) || 0;
+                const barSec1 = document.getElementById('bar-sec1');
+                if (barSec1) barSec1.style.width = sec1 + '%';
+                
+                const sec2 = parseFloat(progressData.pyqProgress) || 0;
+                const barSec2 = document.getElementById('bar-sec2');
+                if (barSec2) barSec2.style.width = sec2 + '%';
+                
+                const sec3 = parseFloat(progressData.testProgress) || 0;
+                const barSec3 = document.getElementById('bar-sec3');
+                if (barSec3) barSec3.style.width = sec3 + '%';
+                
+                // Import daily progress if available
+                if (progressData.dailyTarget !== undefined) {
+                    this.dailyTarget = progressData.dailyTarget;
+                    this.dailyCompleted = progressData.dailyCompleted || 0;
+                    document.getElementById('daily-target-input').value = this.dailyTarget;
+                    this.updateDailyProgress();
+                }
+                
+                // Save to localStorage
+                this.saveUserProgress();
+                
+                this.closeImportModal();
+                Utils.showToast('Legacy progress data imported (individual topics not restored)', true);
+            }
+
             resetSectionProgress(section) {
                 try {
                     const checkboxes = document.querySelectorAll(`.${section}-topic`);
                     
                     if (checkboxes.length > 0 && confirm(`Reset all progress in ${section === 'sec1' ? 'Syllabus' : section === 'sec2' ? 'PYQs' : 'Test Series'}?`)) {
                         checkboxes.forEach(checkbox => {
-                            // FIX: Also remove completedToday flag when resetting section
+                            // Also remove completedToday flag when resetting section
                             if (checkbox.dataset.completedToday) {
                                 this.dailyCompleted = Math.max(0, this.dailyCompleted - 1);
                                 delete checkbox.dataset.completedToday;
@@ -1419,12 +1657,12 @@
                     if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
                         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
                         allCheckboxes.forEach(checkbox => {
-                            // FIX: Remove completedToday flag for all checkboxes
+                            // Remove completedToday flag for all checkboxes
                             delete checkbox.dataset.completedToday;
                             checkbox.checked = false;
                         });
                         
-                        // FIX: Reset daily progress when resetting all
+                        // Reset daily progress when resetting all
                         this.dailyCompleted = 0;
                         
                         ['sec1','sec2','sec3'].forEach(section => this.updateProgress(section));
@@ -1479,9 +1717,27 @@
                     });
                     
                     localStorage.setItem('gate_ece_progress', JSON.stringify(progressData));
-                    console.log('Progress saved successfully', progressData);
                 } catch (error) {
-                    console.error('Error saving user progress:', error);
+                    if (error.name === 'QuotaExceededError') {
+                        console.warn('Local storage quota exceeded, clearing old data');
+                        // Clear and try again with minimal data
+                        localStorage.removeItem('gate_ece_progress');
+                        // Try to save again with just the essential data
+                        try {
+                            const minimalData = {
+                                dailyTarget: this.dailyTarget,
+                                dailyCompleted: this.dailyCompleted,
+                                lastSaved: new Date().toISOString()
+                            };
+                            localStorage.setItem('gate_ece_progress', JSON.stringify(minimalData));
+                            Utils.showToast('Storage cleared due to space limits', true);
+                        } catch (e) {
+                            console.error('Failed to save even minimal data:', e);
+                            Utils.showToast('Failed to save progress due to storage limits', true);
+                        }
+                    } else {
+                        console.error('Error saving user progress:', error);
+                    }
                 }
             }
 
@@ -1493,7 +1749,6 @@
                     
                     if (savedProgress) {
                         const progressData = JSON.parse(savedProgress);
-                        console.log('Loading progress data:', progressData);
                         
                         // Load daily progress
                         if (progressData.dailyTarget !== undefined) {
@@ -1537,16 +1792,18 @@
                         // Update the display after loading all data
                         this.updateDisplay();
                         this.updateDailyProgress();
-                        
-                        console.log('Progress loaded successfully');
-                    } else {
-                        console.log('No saved progress found');
                     }
                 } catch (error) {
                     console.error('Error loading user progress:', error);
                 } finally {
                     this.isLoading = false; // Clear loading flag
                 }
+            }
+
+            // Cleanup method for potential future use
+            destroy() {
+                // Remove all event listeners if needed
+                this._boundHandlers.clear();
             }
         }
 
@@ -1562,4 +1819,3 @@
     </script>
 </body>
 </html>
-

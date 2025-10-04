@@ -386,6 +386,221 @@
             min-height: 0;
             overflow: hidden;
         }
+        
+        /* RESPONSIVE IMPROVEMENTS */
+        
+        /* Mobile-first adjustments */
+        @media (max-width: 767px) {
+            /* Header adjustments */
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .import-export-buttons {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            /* Stats grid adjustments */
+            .grid.grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stats-card, .content-card {
+                padding: 1rem;
+            }
+            
+            /* Main dashboard grid */
+            .dashboard-grid {
+                gap: 1rem;
+            }
+            
+            /* Tab navigation */
+            .flex.space-x-2.mb-6 {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .section-tab {
+                flex: 1;
+                min-width: calc(50% - 0.5rem);
+                text-align: center;
+                padding: 0.75rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            /* Content cards padding */
+            .content-card.p-5 {
+                padding: 1rem;
+            }
+            
+            /* Progress bar height for touch */
+            .h-4 {
+                height: 0.75rem;
+            }
+            
+            .h-3 {
+                height: 0.6rem;
+            }
+            
+            .h-2 {
+                height: 0.5rem;
+            }
+            
+            /* Topic items touch targets */
+            .topic-checkbox {
+                transform: scale(1.3);
+                margin-right: 12px;
+            }
+            
+            /* Compact details touch improvements */
+            .compact-details summary {
+                padding: 1rem;
+            }
+            
+            .compact-details ul {
+                padding: 1rem;
+            }
+            
+            .compact-details li {
+                padding: 0.75rem 0;
+            }
+            
+            /* Button sizes for touch */
+            .btn-reset {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Tab content adjustments */
+            .tab-content-container {
+                max-height: 60vh;
+            }
+            
+            /* Footer text size */
+            footer {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Tablet adjustments */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+            
+            .section-tab {
+                font-size: 0.85rem;
+                padding: 0.7rem 0.8rem;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            body.p-4 {
+                padding: 1rem;
+            }
+            
+            .max-w-7xl {
+                max-width: 100%;
+            }
+            
+            .section-tab {
+                min-width: 100%;
+                margin-bottom: 0.25rem;
+            }
+            
+            .flex.space-x-2.mb-6 {
+                flex-direction: column;
+            }
+            
+            .import-export-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .grid.grid-cols-2 {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .stats-card, .content-card {
+                padding: 0.75rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.75rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-xl {
+                font-size: 1.25rem;
+            }
+            
+            .text-lg {
+                font-size: 1.125rem;
+            }
+            
+            /* Modal adjustments for small screens */
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+                width: calc(100% - 2rem);
+            }
+            
+            /* Toast positioning */
+            .toast {
+                right: 10px;
+                bottom: 10px;
+                left: 10px;
+                text-align: center;
+            }
+        }
+        
+        /* Large screen adjustments */
+        @media (min-width: 1440px) {
+            .max-w-7xl {
+                max-width: 1440px;
+            }
+            
+            .dashboard-grid {
+                gap: 2rem;
+            }
+            
+            .left-column {
+                gap: 2rem;
+            }
+        }
+        
+        /* High DPI screen adjustments */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .progress-bar {
+                transition: width 0.3s ease-in-out;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .btn-reset, #darkModeToggle, .import-export-buttons {
+                display: none;
+            }
+            
+            .content-card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+        }
     </style>
 </head>
 <body class="p-4">
@@ -431,11 +646,11 @@
                 <div class="import-export-buttons">
                     <button id="import-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
                         <i class="fas fa-upload text-blue-600 dark:text-blue-400"></i>
-                        <span class="font-medium">Import</span>
+                        <span class="font-medium hidden sm:inline">Import</span>
                     </button>
                     <button id="export-progress" class="flex items-center space-x-2 p-3 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
                         <i class="fas fa-download text-blue-600 dark:text-blue-400"></i>
-                        <span class="font-medium">Export</span>
+                        <span class="font-medium hidden sm:inline">Export</span>
                     </button>
                 </div>
             </div>
@@ -549,7 +764,7 @@
                                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
                                     <div id="bar-sec2" class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full progress-bar" style="width:0%"></div>
                                 </div>
-                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="pyqs-content">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="pyqs-content">
                                     <!-- Content will be loaded dynamically -->
                                 </div>
                             </div>
